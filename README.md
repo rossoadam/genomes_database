@@ -2,3 +2,4 @@
     to get this working you will need to create the respective conda environment genomes_management.yml
 
 our shared directory
+    /work/10950/axc5473/sharedirectory
