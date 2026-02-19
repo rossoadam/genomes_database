@@ -1,0 +1,18 @@
+#                                                                                                           --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name                                       accession   tlen query name           accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#                               ------------------- ---------- ----- -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+5386at766_1605993_0:00039a|OZ308468.1:458645-459716 -            357 5386                 -            350  5.9e-126  408.7  48.7   1   1  6.6e-126  6.6e-126  408.6  48.7     2   349     1   356     1   357 0.99 -
+5386at766_169402_0:000174|OZ308468.1:458645-459716  -            357 5386                 -            350  5.9e-126  408.7  48.7   1   1  6.6e-126  6.6e-126  408.6  48.7     2   349     1   356     1   357 0.99 -
+5386at766_246273_0:0002c1|OZ308468.1:458645-459716  -            357 5386                 -            350  5.9e-126  408.7  48.7   1   1  6.6e-126  6.6e-126  408.6  48.7     2   349     1   356     1   357 0.99 -
+5386at766_955_0:000030|OZ308468.1:458645-459716     -            357 5386                 -            350  5.9e-126  408.7  48.7   1   1  6.6e-126  6.6e-126  408.6  48.7     2   349     1   356     1   357 0.99 -
+5386at766_96496_0:000165|OZ308468.1:458645-459716   -            357 5386                 -            350  5.9e-126  408.7  48.7   1   1  6.6e-126  6.6e-126  408.6  48.7     2   349     1   356     1   357 0.99 -
+#
+# Program:         hmmsearch
+# Version:         3.4 (Aug 2023)
+# Pipeline mode:   SEARCH
+# Query file:      /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/mb_downloads/rickettsiales_odb12/hmms/5386at766.hmm
+# Target file:     -
+# Option settings: /Users/rossoaa/miniconda3/envs/compleasm_env/bin/hmmsearch --domtblout /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/rickettsiales_odb12/hmmer_output/5386at766.out --cpu 1 /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/mb_downloads/rickettsiales_odb12/hmms/5386at766.hmm - 
+# Current dir:     /Users/rossoaa/Desktop/dummy/genomes/records/compleasm
+# Date:            Tue Feb 10 10:20:22 2026
+# [ok]

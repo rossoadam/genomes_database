@@ -1,0 +1,20 @@
+#                                                                                                             --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name                                         accession   tlen query name           accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#                                 ------------------- ---------- ----- -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+2969at766_1605993_0:000168|OZ308468.1:1172032-1172788 -            252 2969                 -            227   1.6e-77  248.6   8.8   1   1   1.9e-77   1.9e-77  248.4   8.8     8   227    20   251     9   251 0.88 -
+2969at766_169402_0:0004b1|OZ308468.1:1172032-1172788  -            252 2969                 -            227   1.6e-77  248.6   8.8   1   1   1.9e-77   1.9e-77  248.4   8.8     8   227    20   251     9   251 0.88 -
+2969at766_246273_0:00018f|OZ308468.1:1172032-1172788  -            252 2969                 -            227   1.6e-77  248.6   8.8   1   1   1.9e-77   1.9e-77  248.4   8.8     8   227    20   251     9   251 0.88 -
+2969at766_96496_0:000028|OZ308468.1:1172032-1172788   -            252 2969                 -            227   1.6e-77  248.6   8.8   1   1   1.9e-77   1.9e-77  248.4   8.8     8   227    20   251     9   251 0.88 -
+2969at766_1248439_0:000265|OZ308468.1:1172185-1172788 -            201 2969                 -            227   8.4e-73  233.1   8.9   1   1   9.4e-73   9.4e-73  233.0   8.9    37   227     2   200     1   200 0.94 -
+2969at766_142058_0:000201|OZ308468.1:1172185-1172788  -            201 2969                 -            227   8.4e-73  233.1   8.9   1   1   9.4e-73   9.4e-73  233.0   8.9    37   227     2   200     1   200 0.94 -
+2969at766_574556_0:000146|OZ308468.1:1172185-1172788  -            201 2969                 -            227   8.4e-73  233.1   8.9   1   1   9.4e-73   9.4e-73  233.0   8.9    37   227     2   200     1   200 0.94 -
+#
+# Program:         hmmsearch
+# Version:         3.4 (Aug 2023)
+# Pipeline mode:   SEARCH
+# Query file:      /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/mb_downloads/rickettsiales_odb12/hmms/2969at766.hmm
+# Target file:     -
+# Option settings: /Users/rossoaa/miniconda3/envs/compleasm_env/bin/hmmsearch --domtblout /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/rickettsiales_odb12/hmmer_output/2969at766.out --cpu 1 /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/mb_downloads/rickettsiales_odb12/hmms/2969at766.hmm - 
+# Current dir:     /Users/rossoaa/Desktop/dummy/genomes/records/compleasm
+# Date:            Tue Feb 10 10:20:20 2026
+# [ok]

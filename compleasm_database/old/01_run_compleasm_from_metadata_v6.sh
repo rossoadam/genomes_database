@@ -1,0 +1,228 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+METADATA_CSV="/Users/rossoaa/projects/genomes/records/genomes_metadata.csv"
+
+# Directory that CONTAINS lineage folders (e.g. contains sauropsida_odb10/, sauropsida_odb12/)
+LINEAGES_DIR="/Users/rossoaa/projects/mass_predicts_dna_dynamics/pipeline/data/busco_lineages/mb_downloads"
+
+# Default lineage; override like:
+#   LINEAGE_ID=sauropsida_odb12 bash run_compleasm_from_metadata_v6.sh podarcis_muralis
+LINEAGE_ID="${LINEAGE_ID:-sauropsida_odb10}"
+
+OUT_ROOT="/Users/rossoaa/projects/genomes/records/compleasm"
+THREADS="${THREADS:-8}"
+
+# Optional: override miniprot/hmmsearch if needed
+MINIPROT_BIN="${MINIPROT_BIN:-}"
+HMMSEARCH_BIN="${HMMSEARCH_BIN:-}"
+
+# Optional: miniprot --outs cutoff
+OUTS="${OUTS:-0.85}"
+
+QUERY="${1:-}"
+shift || true
+
+while getopts ":t:h" opt; do
+  case "$opt" in
+    t) THREADS="$OPTARG" ;;
+    h)
+      echo "Usage: $(basename "$0") <query|allgenomes> [-t threads]"
+      echo "Env overrides: LINEAGE_ID=..., OUTS=..., MINIPROT_BIN=..., HMMSEARCH_BIN=..."
+      exit 0
+      ;;
+    \?) echo "ERROR: invalid option -$OPTARG" >&2; exit 2 ;;
+    :)  echo "ERROR: option -$OPTARG requires an argument" >&2; exit 2 ;;
+  esac
+done
+
+if [[ -z "$QUERY" ]]; then
+  echo "ERROR: missing argument (<query> or allgenomes)" >&2
+  exit 2
+fi
+
+mkdir -p "$OUT_ROOT" "$LINEAGES_DIR"
+
+# Check lineage exists
+if [[ ! -d "${LINEAGES_DIR}/${LINEAGE_ID}" ]]; then
+  echo "ERROR: lineage directory not found: ${LINEAGES_DIR}/${LINEAGE_ID}" >&2
+  echo "       (Make sure you extracted the tarball into LINEAGES_DIR)" >&2
+  exit 1
+fi
+
+# Find compleasm
+if command -v compleasm >/dev/null 2>&1; then
+  COMPLEASM="compleasm"
+elif command -v compleasm.py >/dev/null 2>&1; then
+  COMPLEASM="compleasm.py"
+else
+  echo "ERROR: compleasm not found in PATH. Activate compleasm_v026 first." >&2
+  exit 1
+fi
+
+# Find miniprot
+if [[ -z "$MINIPROT_BIN" ]]; then
+  if command -v miniprot >/dev/null 2>&1; then
+    MINIPROT_BIN="$(command -v miniprot)"
+  else
+    echo "ERROR: miniprot not found in PATH (and MINIPROT_BIN not set)." >&2
+    exit 1
+  fi
+fi
+
+# Find hmmsearch
+if [[ -z "$HMMSEARCH_BIN" ]]; then
+  if command -v hmmsearch >/dev/null 2>&1; then
+    HMMSEARCH_BIN="$(command -v hmmsearch)"
+  else
+    echo "ERROR: hmmsearch not found in PATH. Install hmmer in this env." >&2
+    exit 1
+  fi
+fi
+
+#############################################
+# Helper: archive old compleasm results
+#############################################
+archive_if_exists() {
+  local outdir="$1"
+  local existing
+  existing="$(find "$outdir" -maxdepth 1 -type d -name "*_odb*" 2>/dev/null || true)"
+  if [[ -n "$existing" ]]; then
+    local archive_root="${outdir}/archive"
+    local ts
+    ts="$(date +%Y-%m-%d_%H-%M-%S)"
+    mkdir -p "$archive_root"
+    while IFS= read -r d; do
+      [[ -z "$d" ]] && continue
+      local base
+      base="$(basename "$d")"
+      echo "[ARCHIVE] Moving existing ${base} -> ${archive_root}/${base}__archived_${ts}"
+      mv "$d" "${archive_root}/${base}__archived_${ts}"
+    done <<< "$existing"
+  fi
+}
+
+#############################################
+# Helper: run compleasm for one genome (Option A)
+#############################################
+
+run_one() {
+  local accession="$1"
+  local organism="$2"
+  local genome="$3"
+
+  if [[ -z "$genome" || ! -f "$genome" ]]; then
+    echo "[WARN] Genome missing, skipping: $genome"
+    return
+  fi
+
+  local safe_org
+  safe_org="$(echo "$organism" | tr ' /' '__' | tr -cd '[:alnum:]_-.')"
+
+  local outdir="${OUT_ROOT}/${accession}__${safe_org}"
+  local lin_dir="${outdir}/${LINEAGE_ID}"
+  local gff="${lin_dir}/miniprot_output.gff"
+  local gff_tmp="${gff}.tmp"
+  local miniprot_log="${lin_dir}/miniprot.stderr.log"
+  local refdb="${LINEAGES_DIR}/${LINEAGE_ID}/refseq_db.faa.gz"
+
+  mkdir -p "$outdir"
+  archive_if_exists "$outdir"
+  mkdir -p "$lin_dir"
+
+  if [[ ! -f "$refdb" ]]; then
+    echo "ERROR: refseq_db.faa.gz not found: $refdb" >&2
+    exit 1
+  fi
+
+  echo "[RUN ] $accession | $organism | lineage=${LINEAGE_ID}"
+  echo "[MINIPROT] $MINIPROT_BIN --outs=$OUTS -t $THREADS"
+  echo "[MINIPROT] Writing: $gff_tmp"
+  echo "[MINIPROT] STDERR : $miniprot_log"
+
+  # Clean temp outputs (don’t risk reading stale files)
+  rm -f "$gff_tmp" "$miniprot_log"
+
+  set -x
+  "$MINIPROT_BIN" --trans -u -I --outs="$OUTS" -t "$THREADS" --gff "$genome" "$refdb" > "$gff_tmp" 2> "$miniprot_log"
+  set +x
+
+  # Validate: non-empty AND contains at least one feature line (not just headers)
+  if [[ ! -s "$gff_tmp" ]]; then
+    echo "ERROR: miniprot produced an empty GFF (stdout was empty)." >&2
+    echo "       Temp: $gff_tmp" >&2
+    echo "       See : $miniprot_log" >&2
+    exit 1
+  fi
+
+  if ! grep -q $'\tminiprot\tmRNA\t' "$gff_tmp"; then
+    echo "ERROR: miniprot GFF has no mRNA features (unexpected format/content)." >&2
+    echo "       Temp: $gff_tmp" >&2
+    echo "       Head:" >&2
+    head -n 25 "$gff_tmp" >&2 || true
+    echo "       See : $miniprot_log" >&2
+    exit 1
+  fi
+
+  mv -f "$gff_tmp" "$gff"
+  echo "[MINIPROT] OK: $(wc -c < "$gff") bytes -> $gff"
+
+  echo "[ANALYZE] compleasm analyze -g <gff> -l ${LINEAGE_ID}"
+  set -x
+  "$COMPLEASM" analyze -g "$gff" -o "$outdir" -l "$LINEAGE_ID" -L "$LINEAGES_DIR" -t "$THREADS" --hmmsearch_execute_path "$HMMSEARCH_BIN"
+  set +x
+}
+
+
+#############################################
+# Batch mode
+#############################################
+if [[ "$QUERY" == "allgenomes" ]]; then
+  echo "[INFO] Running compleasm (Option A) on ALL genomes with lineage=${LINEAGE_ID}"
+  awk -F',' '
+    function trim(s){ gsub(/^[ \t"]+|[ \t"]+$/, "", s); return s }
+    NR==1{ for(i=1;i<=NF;i++) h[trim($i)]=i; next }
+    {
+      acc=trim($(h["accession"]))
+      org=trim($(h["organism_name"]))
+      fna=trim($(h["path_to_fna"]))
+      if(acc!="" && fna!="") print acc "\t" org "\t" fna
+    }
+  ' "$METADATA_CSV" |
+  while IFS=$'\t' read -r acc org fna; do
+    run_one "$acc" "$org" "$fna"
+  done
+  echo "[INFO] allgenomes run complete"
+  exit 0
+fi
+
+#############################################
+# Single-genome mode (robust species matching)
+#############################################
+match="$(
+awk -F',' -v q="$QUERY" '
+  function trim(s){ gsub(/^[ \t"]+|[ \t"]+$/, "", s); return s }
+  function norm(s){ s=tolower(trim(s)); gsub(/[ \t_-]+/, "_", s); gsub(/[^a-z0-9_.]/, "", s); return s }
+  BEGIN{ qn=norm(q) }
+  NR==1{ for(i=1;i<=NF;i++) h[trim($i)]=i; next }
+  {
+    acc=trim($(h["accession"]))
+    org=trim($(h["organism_name"]))
+    fna=trim($(h["path_to_fna"]))
+    if(acc==q || fna==q || norm(org)==qn)
+      print acc "\t" org "\t" fna
+  }
+' "$METADATA_CSV"
+)"
+
+n=$(echo "$match" | awk 'NF{c++} END{print c+0}')
+if [[ "$n" -ne 1 ]]; then
+  echo "ERROR: Query matched $n rows; use accession for uniqueness." >&2
+  echo "$match" >&2
+  exit 1
+fi
+
+IFS=$'\t' read -r acc org fna <<< "$match"
+run_one "$acc" "$org" "$fna"
+
+echo "[INFO] Done"

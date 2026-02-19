@@ -1,0 +1,171 @@
+GC Content & Body Mass Project — Updated Pipeline & Writing Schedule
+Target: Updated manuscript completed by end of March
+
+============================================================
+GENERAL PIPELINE WORKFLOW (UPDATED)
+============================================================
+The overall analysis pipeline will follow this structure:
+
+1) Download genomes from NCBI Datasets
+2) Run Compleasm on genomes and generate outputs compatible with BUSCO-style summaries
+3) Parse genome + Compleasm outputs with custom scripts and upload results to SQL database
+4) Perform statistical analyses and generate figures using downstream scripts
+
+This schedule aligns pipeline refactoring, full reruns, and manuscript revision
+without rushing analytical steps.
+
+============================================================
+PHASE 1: DATA TRANSFER & BASELINE SETUP
+Jan 15 – Jan 26
+============================================================
+Goals:
+- Ensure all data and environments are stable
+- Preserve BUSCO-based results for comparison
+
+Tasks:
+- Transfer all relevant files between computers:
+  * Genome FASTAs
+  * Metadata (GC, body mass, species mapping)
+  * Scripts and SQL schemas
+- Verify file integrity and paths
+- Recreate conda environments and confirm versions
+- Run existing BUSCO-based pipeline end-to-end
+- Archive baseline results (figures, tables, stats)
+
+Deliverables:
+- Fully functional baseline pipeline
+- Archived BUSCO-based results
+
+============================================================
+PHASE 2: PIPELINE REFACTOR — BUSCO → COMPLEASM
+Jan 27 – Feb 9
+============================================================
+Goals:
+- Replace BUSCO with Compleasm while preserving output structure
+
+Tasks:
+- Install and configure Compleasm - Done
+- Select lineage dataset(s) and completeness thresholds - chromosome level, reference, squamata
+- Run Compleasm on test genomes - This seems to be running correctly
+- Document important files such as:
+	full_table.tsv - this gives coordinates that I parse later in the get_cds_from_compleasm	podarcis_muralis_cds_compleasm.fasta - this is output by get_cds_from_compleasm.py
+- Update 01_run_compleasm_from_metadata_v9.sh
+	the cleanup & archiving section now needs to check if data exists for odb10 or 12
+	if data exists then it should not archive but rather skip running compleasm / miniprot for that species
+	this function should be looking for
+		miniprot gff
+		full_table.tsv
+		"$species_genus"_cds_compleasm.fasta
+- 01_run_compleasm_from_metadata_v13.sh does not work and I think this is a environment problem
+	things to do
+		remove apicomplexa and others in mb_downloads in dummy folder
+		download a new genome Aquilegia reuteri and eudicot database to test run compleasm
+		build a new compleasm environment
+- 01_run_compleasm_from_metadata_v14 works
+	I took  bunch of info on the environment and it is located in /Users/rossoaa/Desktop/dummy/old
+	I have moved this to /projects/strength_of_gene_conversion/genomes_database/compleasm_database/old
+	next I need to integrate v13 and v14 to get back to a functioning script.
+
+- if the script finds these files it should verify that their path is in the metadata.csv
+- if the script does not find these files it should run the appropriate step either
+	protein mapping using the odb lineage
+	completeness analysis using compleasm
+	sequence extraction using 02a_get_cds_from_compleasm_v6.py
+
+- Design BUSCO-compatible summary output:
+  * Single-copy completeness
+  * Duplicated genes
+  * Fragmented / missing
+- Update pipeline scripts to consume Compleasm output
+	1) compleasm output
+	2) cds extraction
+	3) multiple sequence alignment across cds
+		"please guide me through turning this script into a bash script. I think the point of this script is to check which genomes have Busco results output. "
+		
+	4) make newick file with iqtree
+		look up inputs for iqtree
+- Document differences between BUSCO and Compleasm
+
+Deliverables:
+- Stable Compleasm module
+- BUSCO-like summary output
+- Updated pipeline documentation
+
+============================================================
+PHASE 3: FULL PIPELINE RUN & SQL INGESTION
+Feb 10 – Feb 23
+============================================================
+Goals:
+- Generate final analysis-ready dataset
+
+Tasks:
+- Download final genome set from NCBI Datasets
+- Run Compleasm across all genomes
+- Compute GC content metrics
+- Run custom parsing scripts:
+  * Merge genome metadata + Compleasm output
+  * Upload cleaned data into SQL database
+- Perform QC:
+  * Missing data
+  * Outliers
+  * Species mismatches
+
+Deliverables:
+- Final SQL tables populated
+- QC summary notes
+
+============================================================
+PHASE 4: STATISTICS & FIGURE GENERATION
+Feb 24 – Mar 9
+============================================================
+Goals:
+- Generate final results and visuals
+
+Tasks:
+- Run statistical analyses (GC vs body mass models)
+- Test robustness and alternative model formulations
+- Compare BUSCO vs Compleasm-based results
+- Regenerate all figures:
+  * Scatterplots
+  * Regression fits
+  * Supplementary QC figures
+
+Deliverables:
+- Final statistical outputs
+- Publication-ready figures
+
+============================================================
+PHASE 5: MANUSCRIPT REVISION
+Mar 10 – Mar 23
+============================================================
+Goals:
+- Update manuscript text to reflect new analyses
+
+Tasks:
+- Update Methods:
+  * Genome acquisition (NCBI Datasets)
+  * Compleasm justification
+  * SQL-based data handling
+- Update Results with new values and figures
+- Revise tables and captions
+- Update supplementary materials
+
+Deliverables:
+- Complete revised manuscript draft
+
+============================================================
+PHASE 6: POLISH & FINALIZATION
+Mar 24 – Mar 31
+============================================================
+Goals:
+- Produce submission-ready manuscript
+
+Tasks:
+- Consistency checks (text ↔ figures ↔ tables)
+- Final language edits
+- Abstract revision
+- Save clean and tracked-changes versions
+- Prepare version for advisor/collaborators
+
+FINAL DELIVERABLE:
+Updated GC content & body mass manuscript completed by end of March.

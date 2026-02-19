@@ -1,0 +1,19 @@
+#                                                                                                           --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name                                       accession   tlen query name           accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#                               ------------------- ---------- ----- -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+4392at766_1359163_0:0000c6|OZ308468.1:715277-715409 -             44 4392                 -             44   4.3e-29   89.0   6.5   1   1   4.6e-29   4.6e-29   88.9   6.5     1    44     1    44     1    44 1.00 -
+4392at766_1423892_0:0000e5|OZ308468.1:715277-715409 -             44 4392                 -             44   4.3e-29   89.0   6.5   1   1   4.6e-29   4.6e-29   88.9   6.5     1    44     1    44     1    44 1.00 -
+4392at766_1605993_0:000088|OZ308468.1:715277-715409 -             44 4392                 -             44   4.3e-29   89.0   6.5   1   1   4.6e-29   4.6e-29   88.9   6.5     1    44     1    44     1    44 1.00 -
+4392at766_169402_0:000243|OZ308468.1:715277-715409  -             44 4392                 -             44   4.3e-29   89.0   6.5   1   1   4.6e-29   4.6e-29   88.9   6.5     1    44     1    44     1    44 1.00 -
+4392at766_246273_0:000345|OZ308468.1:715277-715409  -             44 4392                 -             44   4.3e-29   89.0   6.5   1   1   4.6e-29   4.6e-29   88.9   6.5     1    44     1    44     1    44 1.00 -
+4392at766_955_0:00031c|OZ308468.1:715277-715409     -             44 4392                 -             44   4.3e-29   89.0   6.5   1   1   4.6e-29   4.6e-29   88.9   6.5     1    44     1    44     1    44 1.00 -
+#
+# Program:         hmmsearch
+# Version:         3.4 (Aug 2023)
+# Pipeline mode:   SEARCH
+# Query file:      /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/mb_downloads/rickettsiales_odb12/hmms/4392at766.hmm
+# Target file:     -
+# Option settings: /Users/rossoaa/miniconda3/envs/compleasm_env/bin/hmmsearch --domtblout /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/rickettsiales_odb12/hmmer_output/4392at766.out --cpu 1 /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/mb_downloads/rickettsiales_odb12/hmms/4392at766.hmm - 
+# Current dir:     /Users/rossoaa/Desktop/dummy/genomes/records/compleasm
+# Date:            Tue Feb 10 10:20:23 2026
+# [ok]

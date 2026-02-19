@@ -1,0 +1,21 @@
+#                                                                                                         --- full sequence --- -------------- this domain -------------   hmm coord   ali coord   env coord
+# target name                                     accession   tlen query name           accession   qlen   E-value  score  bias   #  of  c-Evalue  i-Evalue  score  bias  from    to  from    to  from    to  acc description of target
+#                             ------------------- ---------- ----- -------------------- ---------- ----- --------- ------ ----- --- --- --------- --------- ------ ----- ----- ----- ----- ----- ----- ----- ---- ---------------------
+91at766_1605993_0:00000f|OZ308468.1:964379-964667 -             96 91                   -             93   1.2e-45  142.6   0.5   1   1   1.3e-45   1.3e-45  142.4   0.5     2    92     5    95     4    96 0.98 -
+91at766_169402_0:00009f|OZ308468.1:964379-964667  -             96 91                   -             93   1.2e-45  142.6   0.5   1   1   1.3e-45   1.3e-45  142.4   0.5     2    92     5    95     4    96 0.98 -
+91at766_246273_0:000057|OZ308468.1:964379-964667  -             96 91                   -             93   1.2e-45  142.6   0.5   1   1   1.3e-45   1.3e-45  142.4   0.5     2    92     5    95     4    96 0.98 -
+91at766_96496_0:0001c2|OZ308468.1:964379-964667   -             96 91                   -             93   1.2e-45  142.6   0.5   1   1   1.3e-45   1.3e-45  142.4   0.5     2    92     5    95     4    96 0.98 -
+91at766_1242993_0:000276|OZ308468.1:964388-964658 -             91 91                   -             93   3.5e-45  141.0   0.3   1   1   3.8e-45   3.8e-45  140.9   0.3     2    91     2    91     1    91 0.98 -
+91at766_1423892_0:00006a|OZ308468.1:964388-964658 -             91 91                   -             93   3.5e-45  141.0   0.3   1   1   3.8e-45   3.8e-45  140.9   0.3     2    91     2    91     1    91 0.98 -
+91at766_779_0:0002b1|OZ308468.1:964388-964658     -             91 91                   -             93   3.5e-45  141.0   0.3   1   1   3.8e-45   3.8e-45  140.9   0.3     2    91     2    91     1    91 0.98 -
+91at766_955_0:000066|OZ308468.1:964454-964667     -             71 91                   -             93   1.8e-36  113.1   0.2   1   1     2e-36     2e-36  113.0   0.2    23    92     1    70     1    71 0.98 -
+#
+# Program:         hmmsearch
+# Version:         3.4 (Aug 2023)
+# Pipeline mode:   SEARCH
+# Query file:      /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/mb_downloads/rickettsiales_odb12/hmms/91at766.hmm
+# Target file:     -
+# Option settings: /Users/rossoaa/miniconda3/envs/compleasm_env/bin/hmmsearch --domtblout /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/rickettsiales_odb12/hmmer_output/91at766.out --cpu 1 /Users/rossoaa/Desktop/dummy/genomes/records/compleasm/mb_downloads/rickettsiales_odb12/hmms/91at766.hmm - 
+# Current dir:     /Users/rossoaa/Desktop/dummy/genomes/records/compleasm
+# Date:            Tue Feb 10 10:20:21 2026
+# [ok]

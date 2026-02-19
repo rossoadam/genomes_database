@@ -1,0 +1,161 @@
++ set -euo pipefail
++ METADATA_CSV=/Users/rossoaa/projects/genomes/records/genomes_metadata.csv
++ LINEAGES_DIR=/Users/rossoaa/projects/genomes/records/compleasm/busco_lineages/mb_downloads
++ LINEAGE_ID=sauropsida_odb12
++ OUT_ROOT=/Users/rossoaa/projects/genomes/records/compleasm
++ THREADS=8
++ FORCE_RERUN=0
++ METADATA_OUT=/Users/rossoaa/projects/genomes/records/compleasm/metadata.csv
+++ dirname 01_run_compleasm_from_metadata_v11.sh
++ GET_CDS_PY=./02a_get_cds_from_compleasm_v6.py
++ MINIPROT_BIN=
++ HMMSEARCH_BIN=
++ OUTS=0.85
++ QUERY=GCA_964252035.1
++ shift
++ getopts :t:l:fh opt
++ [[ -z GCA_964252035.1 ]]
++ mkdir -p /Users/rossoaa/projects/genomes/records/compleasm /Users/rossoaa/projects/genomes/records/compleasm/busco_lineages/mb_downloads
++ [[ ! -d /Users/rossoaa/projects/genomes/records/compleasm/busco_lineages/mb_downloads/sauropsida_odb12 ]]
++ command -v compleasm
++ COMPLEASM=compleasm
++ [[ -z '' ]]
++ command -v miniprot
+++ command -v miniprot
++ MINIPROT_BIN=/Users/rossoaa/miniprot/miniprot
++ [[ -z '' ]]
++ command -v hmmsearch
+++ command -v hmmsearch
++ HMMSEARCH_BIN=/Users/rossoaa/miniconda3/envs/compleasm_env/bin/hmmsearch
++ [[ -n compleasm_env ]]
++ expected_env=
++ [[ sauropsida_odb12 =~ _odb12$ ]]
++ expected_env=compleasm_env
++ [[ -n compleasm_env ]]
++ [[ compleasm_env != \c\o\m\p\l\e\a\s\m\_\e\n\v ]]
++ [[ ! -f ./02a_get_cds_from_compleasm_v6.py ]]
++ [[ ! -f /Users/rossoaa/projects/genomes/records/compleasm/metadata.csv ]]
++ echo '[Info] Appending to existing: /Users/rossoaa/projects/genomes/records/compleasm/metadata.csv'
++ [[ GCA_964252035.1 == \a\l\l\g\e\n\o\m\e\s ]]
+++ awk -F, -v q=GCA_964252035.1 '
+  function trim(s){ gsub(/^[ \t"]+|[ \t"]+$/, "", s); return s }
+  function norm(s){ s=tolower(trim(s)); gsub(/[ \t_-]+/, "_", s); gsub(/[^a-z0-9_.]/, "", s); return s }
+  BEGIN{ qn=norm(q) }
+  NR==1{ for(i=1;i<=NF;i++) h[trim($i)]=i; next }
+  {
+    acc=trim($(h["accession"]))
+    org=trim($(h["organism_name"]))
+    fna=trim($(h["path_to_fna"]))
+    if(acc==q || fna==q || norm(org)==qn)
+      print acc "\t" org "\t" fna
+  }
+' /Users/rossoaa/projects/genomes/records/genomes_metadata.csv
++ match='GCA_964252035.1	Podarcis erhardii	/Users/rossoaa/projects/genomes/GCA_964252035.1/ncbi_dataset/data/GCA_964252035.1/GCA_964252035.1_rPodErh1.hap1.1_genomic.fna'
+++ echo 'GCA_964252035.1	Podarcis erhardii	/Users/rossoaa/projects/genomes/GCA_964252035.1/ncbi_dataset/data/GCA_964252035.1/GCA_964252035.1_rPodErh1.hap1.1_genomic.fna'
+++ awk 'NF{c++} END{print c+0}'
++ n=1
++ [[ 1 -ne 1 ]]
++ IFS='	'
++ read -r acc org fna
++ run_one GCA_964252035.1 'Podarcis erhardii' /Users/rossoaa/projects/genomes/GCA_964252035.1/ncbi_dataset/data/GCA_964252035.1/GCA_964252035.1_rPodErh1.hap1.1_genomic.fna
++ local accession=GCA_964252035.1
++ local 'organism=Podarcis erhardii'
++ local genome=/Users/rossoaa/projects/genomes/GCA_964252035.1/ncbi_dataset/data/GCA_964252035.1/GCA_964252035.1_rPodErh1.hap1.1_genomic.fna
++ [[ -z /Users/rossoaa/projects/genomes/GCA_964252035.1/ncbi_dataset/data/GCA_964252035.1/GCA_964252035.1_rPodErh1.hap1.1_genomic.fna ]]
++ [[ ! -f /Users/rossoaa/projects/genomes/GCA_964252035.1/ncbi_dataset/data/GCA_964252035.1/GCA_964252035.1_rPodErh1.hap1.1_genomic.fna ]]
++ local safe_org
+++ echo 'Podarcis erhardii'
+++ tr ' /' __
+++ tr -cd '[:alnum:]_-.'
++ safe_org=Podarcis_erhardii
++ local outdir=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii
++ local lin_dir=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12
++ local gff=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff
++ local gff_tmp=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff.tmp
++ local miniprot_log=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot.stderr.log
++ local refdb=/Users/rossoaa/projects/genomes/records/compleasm/busco_lineages/mb_downloads/sauropsida_odb12/refseq_db.faa.gz
++ local genus_species
+++ echo 'Podarcis erhardii'
+++ awk '{print $1"_"$2}'
+++ tr '[:upper:]' '[:lower:]'
+++ tr -cd '[:alnum:]_'
++ genus_species=podarcis_erhardii
++ [[ -z podarcis_erhardii ]]
++ mkdir -p /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii
++ mkdir -p /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12
++ local preferred_lineage=
++ for cand in '"${LINEAGE_ID}"' '"sauropsida_odb12"' '"sauropsida_odb10"'
++ [[ -z sauropsida_odb12 ]]
++ local cand_dir=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12
++ local cand_gff=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff
++ local cand_full=
++ local cand_cds=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/podarcis_erhardii_cds_compleasm.fasta
++ [[ -d /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12 ]]
++ [[ -f /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/full_table.tsv ]]
++ [[ -f /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/full_table.csv ]]
+++ head -n 1
+++ ls -1 '/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/full_table.*'
+++ true
++ cand_full=
++ [[ -s /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff ]]
++ for cand in '"${LINEAGE_ID}"' '"sauropsida_odb12"' '"sauropsida_odb10"'
++ [[ -z sauropsida_odb12 ]]
++ local cand_dir=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12
++ local cand_gff=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff
++ local cand_full=
++ local cand_cds=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/podarcis_erhardii_cds_compleasm.fasta
++ [[ -d /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12 ]]
++ [[ -f /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/full_table.tsv ]]
++ [[ -f /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/full_table.csv ]]
+++ head -n 1
+++ ls -1 '/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/full_table.*'
+++ true
++ cand_full=
++ [[ -s /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff ]]
++ for cand in '"${LINEAGE_ID}"' '"sauropsida_odb12"' '"sauropsida_odb10"'
++ [[ -z sauropsida_odb10 ]]
++ local cand_dir=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb10
++ local cand_gff=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb10/miniprot_output.gff
++ local cand_full=
++ local cand_cds=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb10/podarcis_erhardii_cds_compleasm.fasta
++ [[ -d /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb10 ]]
++ [[ -n '' ]]
++ [[ -d /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12 ]]
++ [[ 0 -ne 1 ]]
++ local need_archive=0
++ local have_gff=0 have_full=0 have_cds=0
++ [[ -s /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff ]]
++ [[ -s /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/podarcis_erhardii_cds_compleasm.fasta ]]
++ [[ -s /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/full_table.tsv ]]
++ [[ -s /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/full_table.csv ]]
++ [[ 0 -ne 1 ]]
++ need_archive=1
++ [[ 1 -eq 1 ]]
++ archive_if_exists /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii sauropsida_odb12
++ local outdir=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii
++ local which=sauropsida_odb12
++ local archive_root=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/archive
++ local ts
+++ date +%Y-%m-%d_%H-%M-%S
++ ts=2026-02-05_14-47-45
++ mkdir -p /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/archive
++ [[ -n sauropsida_odb12 ]]
++ local d=/Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12
++ [[ -d /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12 ]]
++ echo '[ARCHIVE] Moving existing sauropsida_odb12 -> /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/archive/sauropsida_odb12__archived_2026-02-05_14-47-45'
++ mv /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12 /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/archive/sauropsida_odb12__archived_2026-02-05_14-47-45
++ return
++ mkdir -p /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12
++ [[ 0 -eq 1 ]]
++ [[ ! -f /Users/rossoaa/projects/genomes/records/compleasm/busco_lineages/mb_downloads/sauropsida_odb12/refseq_db.faa.gz ]]
++ echo '[RUN ] GCA_964252035.1 | Podarcis erhardii | lineage=sauropsida_odb12'
++ echo '[MINIPROT] /Users/rossoaa/miniprot/miniprot --outs=0.85 -t 8'
++ echo '[MINIPROT] Writing: /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff.tmp'
++ echo '[MINIPROT] STDERR : /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot.stderr.log'
++ rm -f /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff.tmp /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot.stderr.log
++ set -x
++ /Users/rossoaa/miniprot/miniprot --trans -u -I --outs=0.85 -t 8 --gff /Users/rossoaa/projects/genomes/GCA_964252035.1/ncbi_dataset/data/GCA_964252035.1/GCA_964252035.1_rPodErh1.hap1.1_genomic.fna /Users/rossoaa/projects/genomes/records/compleasm/busco_lineages/mb_downloads/sauropsida_odb12/refseq_db.faa.gz
++ set +x
+ERROR: miniprot produced an empty GFF (stdout was empty).
+       Temp: /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot_output.gff.tmp
+       See : /Users/rossoaa/projects/genomes/records/compleasm/GCA_964252035.1__Podarcis_erhardii/sauropsida_odb12/miniprot.stderr.log
