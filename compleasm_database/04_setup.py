@@ -6,6 +6,8 @@ import os
 import sys
 import pandas as pd
 import csv
+import sys
+from pathlib import Path
 
 #######
 # When running on lepidodactylus update with locations on local computer:
@@ -18,27 +20,37 @@ import csv
 
 class setup_b:
    def __init__(self):
-      # this is the directory of busco results
-      self.busco = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results'
-      # this should be the busco results folder for the reference squamate
-      self.busco_id_csv = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/busco_ids_without_duplicates.csv'
+      self.genomes_dir = sys.argv[1]
+      # this should be the compleasm folder containing the lineage refseq db
+      self.busco_id_dir = Path(self.genomes_dir) / 'records/compleasm/mb_downloads/sauropsida_odb12/hmms/'
+      if not self.busco_id_dir.exists():
+         print(f"Error: could not find hmm directory at {self.busco_id_dir}")
+      self.busco_id_list = [f.stem for f in self.busco_id_dir.glob("*.hmm")]
       # this is the metadata for all genomes - actually I need to add data for busco 03 and 04...
-      self.meta = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/metadata_genomes_2.csv'
+      self.genomes_meta = Path(self.genomes_dir) / 'records/genomes_metadata.csv'
+      # this is the metadata for compleasm results
+      self.compleasm_metadata = Path(self.genomes_dir) / 'records/compleasm/metadata.csv'
+      # this is the directory that will contain ouputs from alignments
+      self.alignments = Path(self.genomes_dir) / 'records/compleasm/alignments/'
       # this is the busco output folder for p muralis
-      self.ref_dir = 'GCF_004329235.1_PodMur_1.0_genomic.fna'
+      ### edit this self.ref_dir = 'GCF_004329235.1_PodMur_1.0_genomic.fna' # I'm not sure if this needs to be the cds fasta or the full genome podarcis_muralis_cds_compleasm.fasta
       # all other squamate busco results
-      self.oth_dir = 'GC*_*'
+      ### edit this self.oth_dir = 'GC*_*'
       # this will be the list complete shared orthologs
       self.complete_busco_ids=[]
       # more dirs
-      self.dir_checklist = ['reference','other','01_pre_alignments','02_consolidate']
+      self.dir_checklist = [
+         self.alignments / 'reference',
+         self.alignments / 'other',
+         self.alignments / '01_pre_alignments',
+         self.alignments / '02_consolidate']
       # this is the level of the assembly
       self.assembly = {}
       # this is the target assembly level, choose one or more of the following Complete Chromosome Scaffold
-      self.target = [sys.argv[1],sys.argv[2],sys.argv[3]]
+      self.target = [sys.argv[2],sys.argv[3],sys.argv[4]]
 
    def check(self):
-      contents = os.listdir(self.busco)
+      contents = list(self.alignments.iterdir())
       setup_is_complete = all(item in contents for item in self.dir_checklist)
       if setup_is_complete:
          print('setup is complete:',setup_is_complete)
@@ -50,7 +62,7 @@ class setup_b:
                print('creating:', item)
                cmd = f'mkdir {item}'
                os.system(cmd)
-      contents=os.listdir(self.busco)
+      contents = list(self.alignments.iterdir())
       # the following loop moves all busco output files to either reference or other
       for item in contents:
          if item == 'reference':

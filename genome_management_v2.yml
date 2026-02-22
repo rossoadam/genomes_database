@@ -1,0 +1,45 @@
+name: ncbi_datasets
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - attrs=24.3.0=py313hca03da5_0
+  - biopython=1.85=py313h90d716c_1
+  - bzip2=1.0.8=h80987f9_6
+  - ca-certificates=2025.12.2=hca03da5_0
+  - expat=2.7.1=h313beb8_0
+  - jsonlines=4.0.0=pyhd8ed1ab_0
+  - libblas=3.9.0=1_h9886b1c_netlib
+  - libcblas=3.9.0=1_h9886b1c_netlib
+  - libcxx=17.0.6=he5c5206_4
+  - libffi=3.4.4=hca03da5_1
+  - libgfortran=5.0.0=11_3_0_hca03da5_28
+  - libgfortran5=11.3.0=h009349e_28
+  - liblapack=3.9.0=1_h9886b1c_netlib
+  - libmpdec=4.0.0=h80987f9_0
+  - llvm-openmp=17.0.6=h2f17746_0
+  - ncbi-datasets-cli=18.17.1=hce30654_0
+  - ncurses=6.5=hee39554_0
+  - numpy=2.1.2=py313hab0c69d_0
+  - openssl=3.0.19=ha0b305a_0
+  - pandas=2.2.3=py313h47b39a6_1
+  - pip=25.1=pyhc872135_2
+  - pymysql=1.1.1=pyhd8ed1ab_1
+  - python=3.13.5=h2eb94d5_100_cp313
+  - python-dateutil=2.9.0post0=py313hca03da5_2
+  - python-tzdata=2025.2=pyhd3eb1b0_0
+  - python_abi=3.13=0_cp313
+  - pytz=2024.1=py313hca03da5_0
+  - readline=8.2=h1a28f6b_0
+  - setuptools=78.1.1=py313hca03da5_0
+  - six=1.17.0=py313hca03da5_0
+  - sqlite=3.50.2=h79febb2_1
+  - taxonkit=0.20.0=h4f1019d_0
+  - tk=8.6.14=h6ba3021_1
+  - typing_extensions=4.12.2=py313hca03da5_0
+  - tzdata=2025b=h04d1e81_0
+  - wheel=0.45.1=py313hca03da5_0
+  - xz=5.6.4=h80987f9_1
+  - zlib=1.2.13=h18a0788_1
+prefix: /Users/rossoaa/miniconda3/envs/ncbi_datasets

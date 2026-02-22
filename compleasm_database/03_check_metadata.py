@@ -7,27 +7,33 @@ this code is intended to figure out which genomes are not represented in the met
 import os
 import pandas as pd
 import csv
+import sys
 
 class checker_b:
    def __init__(self):
-      self.genomes_2_metadata = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/metadata_genomes_2.csv'
+      self.genomes_dir = sys.argv[1]
+      self.genomes_metadata = os.path.join(self.genomes_dir,'records','genomes_metadata.csv')
       self.accession_list = []
-      self.busco_dir = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results (copy)'
+      self.compleasm_metadata = os.path.join(self.genomes_dir,'records/compleasm/','metadata.csv')
    def dif(self):
       # open the metadata file and assign to meta
-      with open(self.genomes_2_metadata, 'r') as meta:
-         meta = pd.read_csv(meta)
-         meta_accessions = list(meta['accession'])
-      #print(meta_accessions)
-      #print(type(meta_accessions[0]))
-      busco_dir_list = os.listdir(self.busco_dir)
-      for name in busco_dir_list:
-         #print(name)
+      # print(self.genomes_metadata, self.compleasm_metadata)
+      with open(self.genomes_metadata, 'r') as meta, open(self.compleasm_metadata, 'r') as meta_2:
+         genomes_meta = pd.read_csv(meta)
+         genomes_meta_accessions = list(genomes_meta['accession'])
+         # print(genomes_meta_accessions)
+         # print(type(genomes_meta_accessions[0]))
+         compleasm_meta = pd.read_csv(meta_2)
+         compleasm_meta_accessions = list(compleasm_meta['accession'])
+         # print(compleasm_meta_accessions)
+         # print(type(genomes_meta_accessions[0]))
+      for name in genomes_meta_accessions:
+         # print(name)
          if 'GC' in name:
             check_this = name[:15]
-            #print(type(check_this))
-            if check_this not in meta_accessions:
-               print(name)
+            # print(type(check_this))
+            if check_this not in compleasm_meta_accessions:
+               print("*WARNING*", name, "NOT in COMPLEASM metadata.csv")
                pass
 checker = checker_b()
 checker.dif()
