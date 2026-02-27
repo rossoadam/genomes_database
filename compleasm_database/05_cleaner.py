@@ -12,7 +12,7 @@ class AlignmentCleaner:
         self.fs_csv = self.genomes_dir / 'records/compleasm/records/records_frameshift.csv'
         self.sum_csv = self.genomes_dir / 'records/compleasm/records/records_filter_summary.csv'
         
-        df_meta = pd.read_csv(self.genomes_dir / 'records/compleasm/metadata.csv')
+        df_meta = pd.read_csv(self.genomes_dir / 'records/compleasm/records/metadata.csv')
         self.total_species = len(df_meta)
 
     def clean(self):
