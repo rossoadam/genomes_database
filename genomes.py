@@ -234,7 +234,7 @@ class GenomeManagerHPC:
         with open(csv_path, 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             header = [
-                'accession', 'organism_name',
+                'accession', 'organism_name', 'assembly_level',
                 'path_to_fna', 'path_to_gff', 'path_to_lift_gff',
                 'drive_to_fna', 'drive_to_gff', 'drive_to_lift_gff',
                 'phylum', 'superorder', 'order', 'family', 'genus', 'genus_species'
@@ -282,7 +282,7 @@ class GenomeManagerHPC:
                             pass
 
                     writer.writerow([
-                        acc, organism,
+                        acc, organism, "chromosome",
                         local_fna, local_gff, local_lift,
                         drive_fna, drive_gff, drive_lift,
                         lineage_dict['phylum'], lineage_dict['superorder'], lineage_dict['order'],
@@ -294,13 +294,14 @@ def _usage_and_exit():
     print("Usage: python3 script.py /abs/path/to/genomes 'search_term_or_accession'")
     print("  - First arg: genomes folder (must end with 'genomes')")
     print("  - Second arg: NCBI search term. If it starts with GCA_ or GCF_, accession mode is used; otherwise taxon mode.")
+    print("**Warning this version supports chromosome assembly_level only**")
     sys.exit(1)
 
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         _usage_and_exit()
-
+    print("**Warning this version supports chromosome assembly_level only**")
     genomes_folder = sys.argv[1]
     search_term = sys.argv[2]
 

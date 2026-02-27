@@ -70,10 +70,10 @@ OUT_ROOT="/Users/rossoaa/projects/genomes/records/compleasm"
 LIBDIR="/Users/rossoaa/projects/genomes/records/compleasm/mb_downloads"
 
 ########## compleasm out metadata ##########
-METADATA_OUT="${METADATA_OUT:-${OUT_ROOT}/metadata.csv}"
+METADATA_OUT="${METADATA_OUT:-${OUT_ROOT}/records/metadata.csv}"
 
 ########## CDS extraction script (update path if needed)
-GET_CDS_PY="${GET_CDS_PY:-$(dirname "$0")/02a_get_cds_from_compleasm_v6.py}"
+GET_CDS_PY="${GET_CDS_PY:-$(dirname "$0")/01a_get_cds_from_compleasm_v6.py}"
 
 # -----------------
 # Metadata output (step 4)

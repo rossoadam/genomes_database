@@ -14,7 +14,7 @@ class checker_b:
       self.genomes_dir = sys.argv[1]
       self.genomes_metadata = os.path.join(self.genomes_dir,'records','genomes_metadata.csv')
       self.accession_list = []
-      self.compleasm_metadata = os.path.join(self.genomes_dir,'records/compleasm/','metadata.csv')
+      self.compleasm_metadata = os.path.join(self.genomes_dir,'records/compleasm/records','metadata.csv')
    def dif(self):
       # open the metadata file and assign to meta
       # print(self.genomes_metadata, self.compleasm_metadata)
@@ -37,3 +37,10 @@ class checker_b:
                pass
 checker = checker_b()
 checker.dif()
+
+# Test sync: Writing output to a text file
+# with open("999_sync_test.txt", "w") as f:
+#    f.write("Hello from Colab! This file was created remotely.\n")
+#    f.write(f"Timestamp: {pd.Timestamp.now() if 'pd' in locals() else 'No pandas'}")
+
+# print("Successfully wrote sync_test.txt to Drive.")

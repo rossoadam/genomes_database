@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # python script to get coding sequence from a genome from a compleasm output table
 # python3 get_cds_from_compleasm_v5.py /Volumes/T9/Lepidodactylus_binning/triocanu/JUICER/out_JBAT_final.FINAL_moestus.fa /Volumes/T9/Lepidodactylus_binning/triocanu/lugubris_moestus_compleasm_after_juicer/sauropsida_odb12/full_table.tsv lugubris_moestus
 # python3 get_cds_from_compleasm_v5.py /Volumes/T9/Lepidodactylus_binning/triocanu/JUICER/out_JBAT_final.FINAL_PANTAI.fa /Volumes/T9/Lepidodactylus_binning/triocanu/lugubris_pantai_compleasm_after_juicer/sauropsida_odb12/full_table.tsv lugubris_pantai
