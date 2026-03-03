@@ -6,13 +6,7 @@ import csv
 import json
 import shutil
 import datetime
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
 import argparse # Argument handling
-#>>>>>>> f55480a (Initial commit: Validated Anole and Gecko metadata and genomes.py script)
->>>>>>> d11e087 (validation logic)
 from datetime import date
 from pathlib import Path
 import jsonlines
