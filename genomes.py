@@ -158,8 +158,12 @@ class GenomeManagerHPC:
         tmp_local = os.path.join(self.local_records_folder, 'genomes_catalog.compact.jsonl')
         wrote_any = False
         with jsonlines.open(self.local_genomes_jsonl_pathway, mode='r') as reader, \
-                jsonlines.open(tmp_local, mode='w', compact=True) as writer:
+              jsonlines.open(tmp_local, mode='w', compact=True) as writer:
             for line in reader:
+                acc = line.get('accession', '')
+                # ONLY proceed if this accession was just downloaded in this run
+                if acc not in self.successfully_downloaded_data:
+                    continue
                 writer.write(line)
                 wrote_any = True
         if wrote_any:
@@ -197,16 +201,29 @@ class GenomeManagerHPC:
         return duplicates
 
     def fix_dupes(self):
+        """
+        Deduplicates self.data by organism name, prioritizing GCF (RefSeq) over GCA (GenBank).
+        """
+        # 1. Sort data so GCF comes before GCA for the same organism
+        # GCF starts with 'GCF', GCA starts with 'GCA'. Alphabetically 'GCA' < 'GCF',
+        # so we sort descending to put 'GCF' first.
+        self.data.sort(key=lambda x: x.get('accession', ''), reverse=True)
+
         fixed = []
-        seen = set()
+        seen_organisms = set()
+        
         for genome in self.data:
             acc = genome.get('accession', '')
             organism = genome.get('organism', {}).get('organism_name', '')
-            if organism in seen:
-                continue
-            seen.add(organism)
-            fixed.append(genome)
+            
+            if organism not in seen_organisms:
+                fixed.append(genome)
+                seen_organisms.add(organism)
+            else:
+                self.records_writing(f"Removing duplicate/inferior record: {acc} ({organism})\n")
+        
         self.data = fixed
+        self.records_writing(f"Deduplication complete. {len(self.data)} unique organisms remaining.\n")
 
     def download_new_data(self):
         for entry in self.data:
@@ -231,7 +248,9 @@ class GenomeManagerHPC:
 
     def make_csv(self):
         csv_path = os.path.join(self.local_records_folder, 'genomes_metadata.csv')
-        with open(csv_path, 'w', newline='') as csvfile:
+        # Check if the file already exists to decide if we need a header
+        file_exists = os.path.isfile(csv_path)
+        with open(csv_path, 'a', newline='') as csvfile:
             writer = csv.writer(csvfile)
             header = [
                 'accession', 'organism_name', 'assembly_level',
@@ -239,7 +258,9 @@ class GenomeManagerHPC:
                 'drive_to_fna', 'drive_to_gff', 'drive_to_lift_gff',
                 'phylum', 'superorder', 'order', 'family', 'genus', 'genus_species'
             ]
-            writer.writerow(header)
+            # Only write the header if the file is being created for the first time
+            if not file_exists:
+                writer.writerow(header)
 
             with jsonlines.open(self.local_genomes_jsonl_pathway, 'r') as reader:
                 for line in reader:
@@ -253,6 +274,7 @@ class GenomeManagerHPC:
                     found_lift_active = ''
 
                     for root, dirs, files in os.walk(self.local_genomes_folder):
+                        dirs[:]=dirs
                         for f in files:
                             if f.endswith('.fna') and acc in f:
                                 found_fna_active = os.path.join(root, f)
