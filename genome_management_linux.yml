@@ -1,0 +1,45 @@
+name: ncbi_datasets
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - attrs
+  - biopython
+  - bzip2
+  - ca-certificates
+  - expat
+  - jsonlines
+  - libblas
+  - libcblas
+  - libcxx
+  - libffi
+  - libgfortran
+  - libgfortran5
+  - liblapack
+  - libmpdec
+  - llvm-openmp
+  - ncbi-datasets-cli
+  - ncurses
+  - numpy
+  - openssl
+  - pandas
+  - pip
+  - pymysql
+  - python
+  - python-dateutil
+  - python-tzdata
+  - python_abi
+  - pytz
+  - readline
+  - setuptools
+  - six
+  - sqlite
+  - taxonkit
+  - tk
+  - typing_extensions
+  - tzdata
+  - wheel
+  - xz
+  - zlib
+prefix: /Users/rossoaa/miniconda3/envs/ncbi_datasets
