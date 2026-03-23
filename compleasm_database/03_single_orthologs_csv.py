@@ -1,129 +1,269 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import pandas as pd
-import csv
-from pathlib import Path
 import argparse
+import csv
+import math
+import re
 from collections import Counter
+from pathlib import Path
+
+import pandas as pd
+
 ################
 # EXAMPLE USAGE:
-# 
+#
 # 1. Standard Run (80% occupancy, only Chromosome and Scaffold assemblies):
-#    python 04_single_orthologs_csv.py ../../../genomes "Complete Chromosome" "Scaffold"
-# 
+#    python 03_single_orthologs_csv.py ../../../genomes /path/to/project-manifest.csv "Complete Chromosome" "Scaffold"
+#
 # 2. Strict Run (100% occupancy for a high-quality phylogenomic matrix):
-#    python 04_single_orthologs_csv.py ../../../genomes "Complete Chromosome" --threshold 1.0
-# 
+#    python 03_single_orthologs_csv.py ../../../genomes /path/to/project-manifest.csv "Complete Chromosome" --threshold 1.0
+#
 # 3. Relaxed Run (60% occupancy to maximize gene count):
-#    python 04_single_orthologs_csv.py ../../../genomes "Complete Chromosome" "Scaffold" --threshold 0.6
-# 
+#    python 03_single_orthologs_csv.py ../../../genomes /path/to/project-manifest.csv "Complete Chromosome" "Scaffold" --threshold 0.6
+#
 # ARGUMENTS:
 #   genomes_dir    Path to the root project directory containing 'records/'.
+#   accessions     CSV manifest with an accession column OR txt file with one accession per line.
 #   targets        One or more assembly levels to include. Common values:
 #                  "Complete Chromosome", "Scaffold", "Contig".
 #                  (Separate multiple targets with spaces).
-# 
+#
 # OPTIONAL FLAGS:
 #   --threshold    The fraction of genomes (0.0 - 1.0) that must have a gene
 #                  marked as 'Single' to include it. Default is 0.80 (80%).
 ################
-class get_single_genes_b:
-    def __init__(self, genomes_dir, targets, threshold_pct=0.80):
+
+
+def root_acc(accession: str) -> str:
+    accession = str(accession).strip()
+    return accession.split('.')[0] if accession else accession
+
+
+def accession_version(accession: str) -> int:
+    accession = str(accession).strip()
+    if '.' not in accession:
+        return -1
+    suffix = accession.rsplit('.', 1)[-1]
+    return int(suffix) if suffix.isdigit() else -1
+
+
+class SingleOrthologFinder:
+    def __init__(self, genomes_dir, accessions_file, targets, threshold_pct=0.80):
         self.genomes_dir = Path(genomes_dir).resolve()
-        self.targets = targets
+        self.accessions_file = Path(accessions_file).resolve()
+        self.targets = targets or []
         self.threshold_pct = threshold_pct
-        
-        #### PATHS ####
-        self.gene_id_dir = self.genomes_dir / 'records/compleasm/mb_downloads/sauropsida_odb12/hmms/'
+
+        self.gene_id_dir = self.genomes_dir / 'records/compleasm/mb_downloads/sauropsida_odb12/hmms'
         self.genomes_meta = self.genomes_dir / 'records/genomes_metadata.csv'
         self.compleasm_meta = self.genomes_dir / 'records/compleasm/records/metadata.csv'
-        
+        self.records_dir = self.genomes_dir / 'records/compleasm/records'
+
         if self.gene_id_dir.exists():
-            self.gene_id_list = sorted([f.stem for f in self.gene_id_dir.glob("*.hmm")])
+            self.gene_id_list = sorted(f.stem for f in self.gene_id_dir.glob('*.hmm'))
         else:
             print(f"Error: HMM directory not found at {self.gene_id_dir}")
             self.gene_id_list = []
 
+        self.allowed_accessions, self.allowed_roots = self._load_allowed_accessions()
+        self.cohort_label = self._sanitize_label(self.accessions_file.stem)
+        self.output_path = self.records_dir / f'shared_single_genes_{self.cohort_label}.csv'
         self.single_gene_ids = []
+
+    def _sanitize_label(self, text):
+        return re.sub(r'[^A-Za-z0-9._-]+', '_', text).strip('_')
+
+    def _read_accessions_txt(self, txt_path):
+        accessions = []
+        with open(txt_path, 'r') as handle:
+            for line in handle:
+                value = line.strip()
+                if not value or value.startswith('#'):
+                    continue
+                accessions.append(value.split()[0])
+        return sorted(set(accessions))
+
+    def _read_manifest_accessions(self, manifest_path):
+        df = pd.read_csv(manifest_path)
+        if 'accession' not in df.columns:
+            raise ValueError(f"Manifest is missing required 'accession' column: {manifest_path}")
+        accessions = df['accession'].dropna().astype(str).str.strip()
+        accessions = accessions[accessions != '']
+        return sorted(set(accessions))
+
+    def _load_allowed_accessions(self):
+        suffix = self.accessions_file.suffix.lower()
+        if suffix == '.csv':
+            accessions = self._read_manifest_accessions(self.accessions_file)
+            print(f"Loaded {len(accessions)} accessions from manifest: {self.accessions_file}")
+        else:
+            accessions = self._read_accessions_txt(self.accessions_file)
+            print(f"Loaded {len(accessions)} accessions from txt file: {self.accessions_file}")
+        roots = {root_acc(a) for a in accessions}
+        return set(accessions), roots
 
     def _repath(self, path_to_fix):
         path_str = str(path_to_fix)
         root_name = self.genomes_dir.name
         if root_name in path_str:
-            suffix = path_str.split(root_name)[-1].lstrip('/\\')
+            suffix = path_str.split(root_name, 1)[-1].lstrip('/\\')
             return self.genomes_dir / suffix
         return Path(path_str)
 
+    def _resolve_cohort_rows(self, df, accession_col='accession'):
+        df = df.copy()
+        df[accession_col] = df[accession_col].astype(str).str.strip()
+        df['accession_root'] = df[accession_col].map(root_acc)
+        df['accession_version'] = df[accession_col].map(accession_version)
+
+        exact = df[df[accession_col].isin(self.allowed_accessions)].copy()
+        matched_roots = set(exact['accession_root'])
+        unresolved_roots = self.allowed_roots - matched_roots
+
+        fallback = df[
+            (~df[accession_col].isin(self.allowed_accessions))
+            & (df['accession_root'].isin(unresolved_roots))
+        ].copy()
+
+        if not fallback.empty:
+            fallback = (
+                fallback.sort_values(['accession_root', 'accession_version', accession_col], ascending=[True, False, True])
+                .drop_duplicates(subset=['accession_root'], keep='first')
+            )
+
+        resolved = pd.concat([exact, fallback], ignore_index=True)
+        if resolved.empty:
+            return resolved, sorted(unresolved_roots)
+
+        resolved = (
+            resolved.sort_values(['accession_root', 'accession_version', accession_col], ascending=[True, False, True])
+            .drop_duplicates(subset=['accession_root'], keep='first')
+            .reset_index(drop=True)
+        )
+        missing_roots = sorted(self.allowed_roots - set(resolved['accession_root']))
+        return resolved, missing_roots
+
     def mask(self):
         if not self.gene_id_list:
-            print("no busco IDs found in HMM directory, aborting.")
-            return
-        
+            print('No BUSCO IDs found in HMM directory, aborting.')
+            return []
+
         genomes_df = pd.read_csv(self.genomes_meta)
         compleasm_df = pd.read_csv(self.compleasm_meta)
-        acc_to_level_dict = dict(zip(genomes_df['accession'], genomes_df['assembly_level']))
-        
-        # Use a Counter to track how many genomes have each gene as 'Single'
+
+        genomes_df['accession'] = genomes_df['accession'].astype(str).str.strip()
+        genomes_df['accession_root'] = genomes_df['accession'].map(root_acc)
+        genomes_df['accession_version'] = genomes_df['accession'].map(accession_version)
+        genomes_df = (
+            genomes_df.sort_values(['accession_root', 'accession_version', 'accession'], ascending=[True, False, True])
+            .drop_duplicates(subset=['accession_root'], keep='first')
+            .reset_index(drop=True)
+        )
+
+        compleasm_df, missing_roots = self._resolve_cohort_rows(compleasm_df, accession_col='accession')
+
+        level_by_full = dict(zip(genomes_df['accession'], genomes_df['assembly_level']))
+        level_by_root = dict(zip(genomes_df['accession_root'], genomes_df['assembly_level']))
+
         gene_occurrence_counter = Counter()
         included_count = 0
+        skipped_for_target = 0
+        missing_tsv = 0
+
+        if compleasm_df.empty:
+            print('No compleasm metadata rows matched the provided manifest/txt file.')
+            print(f'Accessions requested: {len(self.allowed_accessions)}')
+            print(f'Missing accession roots after exact/root resolution: {len(missing_roots)}')
+            return []
 
         for _, row in compleasm_df.iterrows():
             acc = row['accession']
-            level = acc_to_level_dict.get(acc)
-            
-            if level not in self.targets:
+            acc_root = row['accession_root']
+            level = level_by_full.get(acc, level_by_root.get(acc_root))
+
+            if self.targets and level not in self.targets:
+                skipped_for_target += 1
                 continue
 
             tsv_path = self._repath(row['full_table'])
             if not tsv_path.exists():
-                print(f"Warning: TSV file missing for {acc}")
+                print(f"Warning: TSV file missing for {acc}: {tsv_path}")
+                missing_tsv += 1
                 continue
 
             try:
-                df_tsv = pd.read_csv(tsv_path, sep='\t', comment='#', header=0, usecols=[0,1], names=['Gene','Status'])
-                
-                # Get genes that are 'Single' in this specific genome
+                df_tsv = pd.read_csv(
+                    tsv_path,
+                    sep='\t',
+                    comment='#',
+                    header=0,
+                    usecols=[0, 1],
+                    names=['Gene', 'Status'],
+                )
                 current_single = df_tsv[df_tsv['Status'] == 'Single']['Gene'].tolist()
-                
-                # Increment counts for these genes
                 gene_occurrence_counter.update(current_single)
-
                 print(f"Processed {acc}: {level}")
                 included_count += 1
             except Exception as e:
                 print(f"Error processing {acc}: {e}")
 
-        # Calculate the required number of genomes based on the threshold
-        required_count = int(included_count * self.threshold_pct)
-        
-        # Filter genes that met the threshold
-        self.single_gene_ids = sorted([
-            gene for gene, count in gene_occurrence_counter.items() 
+        if included_count == 0:
+            print('No genomes passed the filters. Nothing to write.')
+            print(f'Accessions requested: {len(self.allowed_accessions)}')
+            print(f'Compleasm cohort rows resolved: {len(compleasm_df)}')
+            print(f'Rows skipped because of assembly level: {skipped_for_target}')
+            return []
+
+        required_count = max(1, math.ceil(included_count * self.threshold_pct))
+        self.single_gene_ids = sorted(
+            gene
+            for gene, count in gene_occurrence_counter.items()
             if count >= required_count and gene in self.gene_id_list
-        ])
+        )
 
-        print(f"\nFinished. Filtered for assembly levels: {self.targets}")
-        print(f"Occupancy Threshold: {self.threshold_pct*100}% ({required_count}/{included_count} genomes)")
-        print(f"Genes Meeting Threshold: {len(self.single_gene_ids)}")
-
-        output_path = self.genomes_dir / f"records/compleasm/records/shared_single_genes.csv"
-        with open(output_path, 'w', newline='') as f:
+        self.records_dir.mkdir(parents=True, exist_ok=True)
+        with open(self.output_path, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(self.single_gene_ids)
 
-        print(f"Shared IDs written to: {output_path}")
+        print('\nFinished.')
+        print(f"Cohort filter file: {self.accessions_file}")
+        print(f"Accessions requested: {len(self.allowed_accessions)}")
+        print(f"Compleasm cohort rows resolved: {len(compleasm_df)}")
+        print(f"Assembly levels retained: {self.targets if self.targets else 'all'}")
+        print(f"Rows skipped because of assembly level: {skipped_for_target}")
+        print(f"Rows skipped because full_table was missing: {missing_tsv}")
+        print(f"Missing accession roots after exact/root resolution: {len(missing_roots)}")
+        print(f"Occupancy Threshold: {self.threshold_pct * 100:.1f}% ({required_count}/{included_count} genomes)")
+        print(f"Genes Meeting Threshold: {len(self.single_gene_ids)}")
+        print(f"Shared IDs written to: {self.output_path}")
         return self.single_gene_ids
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("genomes_dir", help="Path to genomes directory")
-    parser.add_argument("targets", nargs='+', help="Target assembly levels")
-    parser.add_argument("--threshold", type=float, default=0.80, help="Occupancy threshold (e.g. 0.80 for 80 percent)")
-    
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='Find BUSCO/Compleasm single-copy orthologs across a selected genome cohort.'
+    )
+    parser.add_argument('genomes_dir', help='Path to genomes directory')
+    parser.add_argument('accessions', help='CSV manifest with accession column or TXT with one accession per line')
+    parser.add_argument(
+        'targets',
+        nargs='*',
+        help='Optional assembly levels to keep, e.g. "Complete Chromosome" "Scaffold"',
+    )
+    parser.add_argument(
+        '--threshold',
+        type=float,
+        default=0.80,
+        help='Occupancy threshold (e.g. 0.80 for 80 percent)',
+    )
     args = parser.parse_args()
-    
-    # Updated class call (removed reference_input as it wasn't used in your class logic)
-    get_genes = get_single_genes_b(args.genomes_dir, args.targets, threshold_pct=args.threshold)
-    get_genes.mask()
+
+    finder = SingleOrthologFinder(
+        args.genomes_dir,
+        args.accessions,
+        args.targets,
+        threshold_pct=args.threshold,
+    )
+    finder.mask()
