@@ -12,7 +12,7 @@ Positional:
 
 Options:
   -t INT       Threads (default: ${THREADS:-8})
-  -l STR       Lineage ID (default: ${LINEAGE_ID:-rickettsiales_odb12})
+  -l STR       Lineage ID (default: ${LINEAGE_ID:-sauropsida_odb12})
   -f           Force rerun (archive lineage dir even if outputs exist)
   -h           Help
 

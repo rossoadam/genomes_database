@@ -135,6 +135,25 @@ NOTES
   passing the correct GFF path via -g.
 - This pipeline preserves backward compatibility with odb10 while enabling
   forward use of odb12 for updated analyses.
+- MAR302026
+(bio) rossoaa@BIOL-135085 compleasm_database % python3 05_cleaner.py /Users/rossoaa/projects/genomes
+--- Cleaning with Threshold: 0.9 ---
+--- Frameshift <= 1 ---
+/Users/rossoaa/projects/genomes/records/project_manifests/mass_predicts_dna_dynamics_manifest.csv
+
+Commands:
+python3 03_single_orthologs_csv_manifest_edit.py ../../../genomes \
+  /Users/rossoaa/projects/genomes/records/project_manifests/mass_predicts_dna_dynamics_manifest.csv \
+  "Complete" "Chromosome" \
+  --threshold 0.80
+
+python3 04_prealign_to_macse_manifest_edit.py ../../../genomes \
+  /Users/rossoaa/projects/genomes/records/project_manifests/mass_predicts_dna_dynamics_manifest.csv \
+  --test -j 4
+
+python3 04_prealign_to_macse_manifest_edit.py ../../../genomes \
+  /Users/rossoaa/projects/genomes/records/project_manifests/mass_predicts_dna_dynamics_manifest.csv \
+  -j 10
 
 ---------------------------------------------------------------------------
 AUTHOR / MAINTAINER
