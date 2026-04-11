@@ -1,0 +1,12 @@
+name: macse
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - bioconda::macse
+  - pal2nal
+  - conda-forge::parallel
+  - anaconda::pandas
+  - conda-forge::biopython
+prefix: /Users/rossoaa/miniconda3/envs/macse
