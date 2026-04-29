@@ -10,6 +10,24 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
+"""
+USAGE:
+    python3 01_scrape_genome_size.py --pages 10 --outdir ./reptile_data --sleep 1.0
+
+DESCRIPTION:
+    A specialized scraper designed to extract C-value (genome size) records 
+    from the Animal Genome Size Database (genomesize.com). 
+
+    The script targets reptile search results, crawls individual species detail pages, 
+    and parses C-value measurements (in picograms) using regex and table extraction. 
+    Outputs include a summary CSV and raw table rows for downstream data cleaning 
+    and integration into genomic pipelines.
+
+ARGUMENTS:
+    -o, --outdir : Directory to save CSVs and cached HTML files (default: genomes/records/...)
+    --pages      : Total number of results pages to iterate through (default: 5)
+    --sleep      : Rate-limiting delay between GET requests (default: 0.75s)
+"""
 
 BASE = "https://www.genomesize.com"
 

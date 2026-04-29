@@ -15,6 +15,25 @@ Example c_values_pg_detected:
 2.66;3.50;2.60
 """
 
+"""
+USAGE:
+    python3 02_summarize_scraped_data.py -i ./reptiles/reptile_c_values_detected_summary.csv -o ./analysis_results
+
+DESCRIPTION:
+    Processes raw output from '01_scrape_genome_size.py' to generate descriptive 
+    statistics for reptile genome sizes. 
+
+    The script 'explodes' multiple C-value measurements per species into a long-format 
+    DataFrame, converts picograms (pg) to Megabases (Mb) and Gigabases (Gb) using 
+    the standard 1pg = 978Mb conversion factor, and exports species-level and 
+    population-level summaries.
+
+OUTPUTS:
+    - expanded_c_values.csv: Every detected measurement as an individual record.
+    - species_summary.csv: Aggregated stats (mean, median, std, etc.) per species.
+    - overall_summary.csv: Global dataset metrics for the study.
+"""
+
 import argparse
 from pathlib import Path
 import pandas as pd
