@@ -46,14 +46,14 @@ class TreeParser:
         self.dianc_dict= {}
         self.number_of_orthologs = len(self.ortholog_list)
         # this needs to be edited to the directory and filename I want to output
-        self.dij_output = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/dij_results_oct_29.json'
-        self.dianc_output= '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/dianc_results_oct_29.json'
-        self.gc3_output = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/gc3_results_oct_29.json'
-        self.gc3_vs_stdv_output =  '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/gc3_vs_stdv_'+str(self.number_of_orthologs)+'.csv'
-        self.top = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results'
-        self.dir_gc3_per_gene = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/03_gc3_per_gene'
-        self.genome_size_csv = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/squamata_genomes_2/genome_size.csv'
-        self.species_mass_csv = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/species_mass.csv' 
+        self.dij_output = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/projects_local/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/dij_results_20260427.json'
+        self.dianc_output= '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/projects_local/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/dianc_results_20260427.json'
+        self.gc3_output = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/projects_local/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/gc3_results_20260427.json'
+        self.gc3_vs_stdv_output =  '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/projects_local/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/gc3_vs_stdv_20260427'+str(self.number_of_orthologs)+'.csv'
+        self.top = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/projects_local/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/'
+        self.dir_gc3_per_gene = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/projects_local/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/03_gc3_per_gene'
+        self.genome_size_csv = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/old/genomes_2/genomes/trash/old/genome_size.csv'
+        self.species_mass_csv = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/old/genomes_2/busco_run_05_results/species_mass.csv' 
         self.species_common_csv = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/species_common.csv'
         self.metadata_csv = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/metadata_genomes_2.csv' 
         self.master_output = '/media/lepidodactylus/2aa24196-95e9-4ebf-8899-7161cb272356/home/leptodactylus/genomes_2/busco_run_05_results/master_output'+str(self.number_of_orthologs)+'.csv'

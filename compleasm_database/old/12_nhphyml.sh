@@ -18,8 +18,8 @@ INPUT_DIR="$1"
 TREE_FILE="$2"
 
 # Optional args
-NHPHYML_BIN="/Users/rossoaa/src/nhPhyml/nhPhyml"
-
+#NHPHYML_BIN="/Users/rossoaa/src/nhPhyml/nhPhyml"
+NHPHYML_BIN="/home/lepidodactylus/bin/nhPhyml/nhPhyml"
 # Default output directory (sister directory)
 if [ -z "$4" ]; then
     PARENT_DIR=$(dirname "${INPUT_DIR%/}")

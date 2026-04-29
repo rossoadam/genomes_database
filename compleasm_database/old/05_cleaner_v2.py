@@ -6,55 +6,25 @@ import pandas as pd
 from Bio.SeqIO.FastaIO import SimpleFastaParser
 
 
-def load_id_file(path):
-    """
-    Load one ID per line from a plain-text file.
-    Blank lines and lines starting with '#' are ignored.
-    """
-    file_path = Path(path).resolve()
-    if not file_path.exists():
-        raise FileNotFoundError(f"List file not found: {file_path}")
-
-    items = []
-    with open(file_path, "r") as handle:
-        for line in handle:
-            value = line.strip()
-            if not value or value.startswith("#"):
-                continue
-            items.append(value)
-    return items
-
-
 class AlignmentCleaner:
-    def __init__(
-        self,
-        genomes_dir,
-        manifest,
-        threshold,
-        errors,
-        omit=None,
-        frameshift_only=False,
-        macse_dir=None,
-        drop_genes=None,
-    ):
+    def __init__(self, genomes_dir, manifest, threshold, errors, omit=None, frameshift_only=False, macse_dir=None):
         self.genomes_dir = Path(genomes_dir).resolve()
         self.manifest = Path(manifest).resolve()
         self.threshold = threshold
         self.errors = errors
         self.omit = set(omit or [])
         self.frameshift_only = frameshift_only
-        self.drop_genes = set(drop_genes or [])
-
         if macse_dir:
             self.macse_dir = Path(macse_dir).resolve()
         else:
             self.macse_dir = self.genomes_dir / "records/compleasm/alignments/02_macse_alignments"
-
         self.fs_csv = self.genomes_dir / "records/compleasm/records/records_frameshift.csv"
         self.sum_csv = self.genomes_dir / "records/compleasm/records/records_filter_summary.csv"
 
+        # Read project manifest instead of metadata.csv
         df_manifest = pd.read_csv(self.manifest)
 
+        # Assumption: the manifest has an accession column.
         if "accession" not in df_manifest.columns:
             raise ValueError(
                 f"Manifest must contain an 'accession' column. "
@@ -63,12 +33,13 @@ class AlignmentCleaner:
 
         self.allowed_taxa = set(df_manifest["accession"].astype(str).str.strip())
 
+        # Only omit taxa that are actually in the manifest
         self.valid_omit = self.allowed_taxa.intersection(self.omit)
         self.invalid_omit = self.omit.difference(self.allowed_taxa)
 
         if self.invalid_omit:
             print(
-                "Warning: these omitted taxa were not found in the manifest and will be ignored:\n"
+                "Warning: these --omit taxa were not found in the manifest and will be ignored:\n"
                 + ", ".join(sorted(self.invalid_omit))
             )
 
@@ -82,7 +53,7 @@ class AlignmentCleaner:
         if self.total_species <= 0:
             raise ValueError(
                 f"total_species became {self.total_species}. "
-                f"Check the manifest and omitted accessions."
+                f"Check the manifest and --omit values."
             )
 
     @staticmethod
@@ -115,29 +86,6 @@ class AlignmentCleaner:
 
             print("Please enter 'rewrite' or 'append'.")
 
-    def iter_nt_files(self):
-        nt_files = sorted(self.macse_dir.glob("*_NT.fasta"))
-        available_gene_ids = {p.name.replace("_NT.fasta", "") for p in nt_files}
-        dropped_files = 0
-
-        for nt_file in nt_files:
-            gene_id = nt_file.name.replace("_NT.fasta", "")
-            if gene_id in self.drop_genes:
-                dropped_files += 1
-                continue
-            yield nt_file
-
-        if self.drop_genes:
-            print(f"--- Dropping {len(self.drop_genes)} requested genes from all processing ---")
-            matched = len(available_gene_ids.intersection(self.drop_genes))
-            unmatched = sorted(self.drop_genes.difference(available_gene_ids))
-            print(f"--- Matched {matched} genes in the alignment directory; skipped {dropped_files} files ---")
-            if unmatched:
-                print(
-                    "Warning: these dropped gene IDs were not found in the alignment directory and will be ignored:\n"
-                    + ", ".join(unmatched)
-                )
-
     def collect_frameshift_data(self):
         fs_data = []
         total_processed = 0
@@ -150,7 +98,7 @@ class AlignmentCleaner:
 
         print(f"--- Total species considered: {self.total_species} ---")
 
-        for nt_file in self.iter_nt_files():
+        for nt_file in self.macse_dir.glob("*_NT.fasta"):
             gene_id = nt_file.name.replace("_NT.fasta", "")
             total_processed += 1
 
@@ -158,9 +106,11 @@ class AlignmentCleaner:
                 for header, seq in SimpleFastaParser(handle):
                     seq_id = self.normalize_header(header)
 
+                    # Skip taxa not in the manifest
                     if seq_id not in self.allowed_taxa:
                         continue
 
+                    # Skip explicitly omitted taxa
                     if seq_id in self.valid_omit:
                         continue
 
@@ -209,10 +159,11 @@ class AlignmentCleaner:
         for row in fs_data:
             fs_lookup.setdefault(row["gene_id"], []).append(row)
 
-        for nt_file in self.iter_nt_files():
+        for nt_file in self.macse_dir.glob("*_NT.fasta"):
             gene_id = nt_file.name.replace("_NT.fasta", "")
             clean_seqs, clean_count = [], 0
 
+            # Build a quick lookup of accession -> filtered status for this gene
             gene_rows = {
                 row["accession"]: row["sequence_filtered"]
                 for row in fs_lookup.get(gene_id, [])
@@ -256,8 +207,6 @@ class AlignmentCleaner:
                 "total_species_considered": self.total_species,
                 "omitted_taxa_count": len(self.valid_omit),
                 "omitted_taxa": ",".join(sorted(self.valid_omit)),
-                "drop_genes_count": len(self.drop_genes),
-                "drop_genes": ",".join(sorted(self.drop_genes)),
                 "total_genes_analyzed": total_processed,
                 "genes_dropped": len(dropped_ids),
                 "genes_retained": total_processed - len(dropped_ids),
@@ -281,8 +230,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--macse_dir",
         required=False,
-        help="Path to directory containing macse alignments.",
-    )
+        help="Path to directory containing macse alignments.")
     parser.add_argument(
         "--manifest",
         required=True,
@@ -297,43 +245,18 @@ if __name__ == "__main__":
         help="One or more taxa/accessions from the manifest to omit.",
     )
     parser.add_argument(
-        "--omit_file",
-        required=False,
-        help="Path to a text file containing one accession per line to omit.",
-    )
-    parser.add_argument(
-        "--drop_genes",
-        nargs="+",
-        default=[],
-        help="One or more gene IDs to exclude from all processing and output alignments.",
-    )
-    parser.add_argument(
-        "--drop_genes_file",
-        required=False,
-        help="Path to a text file containing one gene ID per line to exclude.",
-    )
-    parser.add_argument(
         "--frameshift",
         action="store_true",
         help="Only write the frameshift CSV, without producing cleaned FASTA files or filter summary output.",
     )
     args = parser.parse_args()
 
-    omit_values = list(args.omit)
-    if args.omit_file:
-        omit_values.extend(load_id_file(args.omit_file))
-
-    drop_gene_values = list(args.drop_genes)
-    if args.drop_genes_file:
-        drop_gene_values.extend(load_id_file(args.drop_genes_file))
-
     AlignmentCleaner(
         genomes_dir=args.genomes_dir,
         manifest=args.manifest,
         threshold=args.threshold,
         errors=args.errors,
-        omit=sorted(set(omit_values)),
+        omit=args.omit,
         macse_dir=args.macse_dir,
-        frameshift_only=args.frameshift,
-        drop_genes=sorted(set(drop_gene_values)),
+        frameshift_only=args.frameshift
     ).clean()

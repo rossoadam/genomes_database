@@ -9,16 +9,24 @@ set -e
 
 # Check inputs
 if [ -z "$1" ] || [ -z "$2" ]; then
-    echo "Usage: $0 <genomes_dir> <phylip_file> [outgroup_txt]"
+    echo "Usage: $0 <genomes_dir> <phylip_file> [outgroup_txt] [outdirectory_suffix]"
     exit 1
 fi
 
 GENOMES_DIR="$1"
 PHY_FILE="$2"
 OUTGROUP_TXT="${3:-}"
+SUFFIX="$4"
 
-# Define output directory
-OUT_DIR="$GENOMES_DIR/records/compleasm/alignments/05_unrooted_tree"
+# BASE directory path
+BASE_OUT="$GENOMES_DIR/records/compleasm/alignments/05_unrooted_tree"
+
+
+if [ -n "$SUFFIX" ]; then
+    OUT_DIR="${BASE_OUT}_${SUFFIX}"
+else
+    OUT_DIR="$BASE_OUT"
+fi
 
 # Create output directory if it doesn't exist
 mkdir -p "$OUT_DIR"

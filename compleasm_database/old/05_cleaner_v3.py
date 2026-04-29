@@ -6,25 +6,6 @@ import pandas as pd
 from Bio.SeqIO.FastaIO import SimpleFastaParser
 
 
-def load_id_file(path):
-    """
-    Load one ID per line from a plain-text file.
-    Blank lines and lines starting with '#' are ignored.
-    """
-    file_path = Path(path).resolve()
-    if not file_path.exists():
-        raise FileNotFoundError(f"List file not found: {file_path}")
-
-    items = []
-    with open(file_path, "r") as handle:
-        for line in handle:
-            value = line.strip()
-            if not value or value.startswith("#"):
-                continue
-            items.append(value)
-    return items
-
-
 class AlignmentCleaner:
     def __init__(
         self,
@@ -68,7 +49,7 @@ class AlignmentCleaner:
 
         if self.invalid_omit:
             print(
-                "Warning: these omitted taxa were not found in the manifest and will be ignored:\n"
+                "Warning: these --omit taxa were not found in the manifest and will be ignored:\n"
                 + ", ".join(sorted(self.invalid_omit))
             )
 
@@ -82,7 +63,7 @@ class AlignmentCleaner:
         if self.total_species <= 0:
             raise ValueError(
                 f"total_species became {self.total_species}. "
-                f"Check the manifest and omitted accessions."
+                f"Check the manifest and --omit values."
             )
 
     @staticmethod
@@ -117,7 +98,6 @@ class AlignmentCleaner:
 
     def iter_nt_files(self):
         nt_files = sorted(self.macse_dir.glob("*_NT.fasta"))
-        available_gene_ids = {p.name.replace("_NT.fasta", "") for p in nt_files}
         dropped_files = 0
 
         for nt_file in nt_files:
@@ -129,12 +109,12 @@ class AlignmentCleaner:
 
         if self.drop_genes:
             print(f"--- Dropping {len(self.drop_genes)} requested genes from all processing ---")
-            matched = len(available_gene_ids.intersection(self.drop_genes))
-            unmatched = sorted(self.drop_genes.difference(available_gene_ids))
+            matched = len({p.name.replace('_NT.fasta', '') for p in nt_files}.intersection(self.drop_genes))
+            unmatched = sorted(self.drop_genes.difference({p.name.replace('_NT.fasta', '') for p in nt_files}))
             print(f"--- Matched {matched} genes in the alignment directory; skipped {dropped_files} files ---")
             if unmatched:
                 print(
-                    "Warning: these dropped gene IDs were not found in the alignment directory and will be ignored:\n"
+                    "Warning: these --drop_genes IDs were not found in the alignment directory and will be ignored:\n"
                     + ", ".join(unmatched)
                 )
 
@@ -281,8 +261,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--macse_dir",
         required=False,
-        help="Path to directory containing macse alignments.",
-    )
+        help="Path to directory containing macse alignments.")
     parser.add_argument(
         "--manifest",
         required=True,
@@ -297,20 +276,10 @@ if __name__ == "__main__":
         help="One or more taxa/accessions from the manifest to omit.",
     )
     parser.add_argument(
-        "--omit_file",
-        required=False,
-        help="Path to a text file containing one accession per line to omit.",
-    )
-    parser.add_argument(
         "--drop_genes",
         nargs="+",
         default=[],
         help="One or more gene IDs to exclude from all processing and output alignments.",
-    )
-    parser.add_argument(
-        "--drop_genes_file",
-        required=False,
-        help="Path to a text file containing one gene ID per line to exclude.",
     )
     parser.add_argument(
         "--frameshift",
@@ -319,21 +288,13 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    omit_values = list(args.omit)
-    if args.omit_file:
-        omit_values.extend(load_id_file(args.omit_file))
-
-    drop_gene_values = list(args.drop_genes)
-    if args.drop_genes_file:
-        drop_gene_values.extend(load_id_file(args.drop_genes_file))
-
     AlignmentCleaner(
         genomes_dir=args.genomes_dir,
         manifest=args.manifest,
         threshold=args.threshold,
         errors=args.errors,
-        omit=sorted(set(omit_values)),
+        omit=args.omit,
         macse_dir=args.macse_dir,
         frameshift_only=args.frameshift,
-        drop_genes=sorted(set(drop_gene_values)),
+        drop_genes=args.drop_genes,
     ).clean()
