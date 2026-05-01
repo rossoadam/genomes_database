@@ -31,7 +31,7 @@ Optional:
 
   --input-tsv-dir
       Default: <genomes_dir>/records/gc_metrics_inputs
-      Reads genome_sizes.tsv, species_mass.tsv, and thermal_limits.tsv if present.
+      Reads genome_sizes.tsv and species_mass.tsv if present.
 
 Outputs:
   <outdir>/gc3_per_gene.tsv
@@ -42,8 +42,6 @@ Outputs:
   <outdir>/dianc_results.tsv
   <outdir>/master_output.tsv
   <outdir>/master_merge_diagnostics.tsv
-  <outdir>/species_merge_report.tsv
-  <outdir>/master_complete_cases.tsv
 
 Example:
   python 04_calculate_gc_divergence.py /path/to/genomes \
@@ -289,6 +287,72 @@ def load_species_metadata_from_manifest_or_compleasm(
 
 
 
+def apply_user_added_mass_overrides(
+    master: pd.DataFrame,
+    species_metadata: Optional[pd.DataFrame] = None,
+    append_missing_user_added_species: bool = False,
+) -> pd.DataFrame:
+    """
+    Add/overwrite user-curated mass values that are missing from the natural
+    history mass files.
+
+    If append_missing_user_added_species=True, this can add a row for a
+    user-curated species even when it is absent from the GC-tree subset. Such
+    rows will have blank GC/divergence fields, so they can be excluded from
+    regression by filtering for non-missing mean_gc3/dianc.
+    """
+    overrides = {
+        "phrynocephalus_guinanensis": {
+            "mass_value": 11.1,
+            "source": "Ji_et_al_user_added",
+        }
+    }
+
+    for genus_species, info in overrides.items():
+        mask = master["genus_species"] == genus_species
+
+        if not mask.any() and append_missing_user_added_species:
+            new_row = {col: pd.NA for col in master.columns}
+            new_row["genus_species"] = genus_species
+
+            if "organism_name" in master.columns:
+                new_row["organism_name"] = genus_species.replace("_", " ")
+
+            if species_metadata is not None and not species_metadata.empty:
+                meta_hit = species_metadata[species_metadata["genus_species"] == genus_species]
+                if not meta_hit.empty:
+                    if "organism_name" in master.columns and "organism_name" in meta_hit.columns:
+                        new_row["organism_name"] = meta_hit["organism_name"].iloc[0]
+                    if "accession" in master.columns and "accession" in meta_hit.columns:
+                        new_row["accession"] = meta_hit["accession"].iloc[0]
+
+            master = pd.concat([master, pd.DataFrame([new_row])], ignore_index=True)
+            mask = master["genus_species"] == genus_species
+
+        if not mask.any():
+            continue
+
+        for col in ["mass_meiri", "mass_title", "mass_preferred", "mass_source_preferred"]:
+            if col not in master.columns:
+                master[col] = pd.NA
+
+        # Keep mass_meiri and mass_title as-is, but ensure preferred mass is
+        # populated for downstream regression.
+        master.loc[mask, "mass_preferred"] = master.loc[mask, "mass_preferred"].fillna(info["mass_value"])
+
+        needs_source = (
+            master.loc[mask, "mass_source_preferred"].isna()
+            | (master.loc[mask, "mass_source_preferred"].astype(str).str.strip() == "")
+        )
+        master.loc[mask, "mass_source_preferred"] = master.loc[mask, "mass_source_preferred"].where(
+            ~needs_source,
+            info["source"],
+        )
+
+    return master
+
+
+
 def parse_node_relationships(path: Path) -> Dict[str, Dict[str, List[float]]]:
     """
     Parse node_numbers_rebuilt.csv from 99_compout_tree_to_csv.py.
@@ -376,6 +440,7 @@ class NhPhymlGcDivergence:
         input_tsv_dir: Optional[Path] = None,
         manifest: Optional[Path] = None,
         include_all_manifest_species: bool = False,
+        append_user_added_non_gc_rows: bool = False,
         tree_suffix: str = ".phylip_nhPhymlGC.tree",
         lk_suffix: str = ".phylip_nhPhyml.lk",
         strict: bool = False,
@@ -389,6 +454,7 @@ class NhPhymlGcDivergence:
         self.input_tsv_dir = input_tsv_dir
         self.manifest = manifest
         self.include_all_manifest_species = include_all_manifest_species
+        self.append_user_added_non_gc_rows = append_user_added_non_gc_rows
         self.tree_suffix = tree_suffix
         self.lk_suffix = lk_suffix
         self.strict = strict
@@ -686,7 +752,6 @@ class NhPhymlGcDivergence:
                 for c in [
                     "genus_species",
                     "mass_meiri",
-                    "mass_ji",
                     "mass_title",
                     "mass_preferred",
                     "mass_source_preferred",
@@ -695,29 +760,6 @@ class NhPhymlGcDivergence:
             ]
             master = master.merge(
                 species_mass[keep].drop_duplicates("genus_species"),
-                on="genus_species",
-                how="left",
-            )
-
-        thermal_limits = self.read_input_tsv("thermal_limits.tsv")
-        if thermal_limits is not None:
-            thermal_limits = thermal_limits.copy()
-            thermal_limits["genus_species"] = thermal_limits["genus_species"].map(normalize_species_name)
-            keep = [
-                c
-                for c in [
-                    "genus_species",
-                    "ctmax",
-                    "ctmax_metric",
-                    "ctmin",
-                    "ctmin_metric",
-                    "thermal_source",
-                    "n_thermal_rows_for_species",
-                ]
-                if c in thermal_limits.columns
-            ]
-            master = master.merge(
-                thermal_limits[keep].drop_duplicates("genus_species"),
                 on="genus_species",
                 how="left",
             )
@@ -763,6 +805,8 @@ class NhPhymlGcDivergence:
             if col in master.columns:
                 master[col] = master[col].replace({"nan": pd.NA, "None": pd.NA, "": pd.NA})
 
+        master = apply_user_added_mass_overrides(master, species_metadata=manifest_df, append_missing_user_added_species=self.append_user_added_non_gc_rows)
+
         preferred_order = [
             "genus_species",
             "organism_name",
@@ -777,14 +821,9 @@ class NhPhymlGcDivergence:
             "mean_genome_gb",
             "genome_size",
             "mass_meiri",
-            "mass_ji",
             "mass_title",
             "mass_preferred",
             "mass_source_preferred",
-            "ctmax",
-            "ctmax_metric",
-            "ctmin",
-            "ctmin_metric",
         ]
         ordered = [c for c in preferred_order if c in master.columns]
         remaining = [c for c in master.columns if c not in ordered]
@@ -802,17 +841,8 @@ class NhPhymlGcDivergence:
             complete_cases = master.dropna(subset=required_complete_cols).copy()
             write_tsv(complete_cases, self.outdir / "master_complete_cases.tsv")
 
-        thermal_complete_cols = [
-            c
-            for c in ["mean_gc3", "sd_gc3", "n_orthologs", "dianc", "genome_size", "mass_preferred", "ctmax", "ctmin"]
-            if c in master.columns
-        ]
-        if thermal_complete_cols:
-            thermal_complete_cases = master.dropna(subset=thermal_complete_cols).copy()
-            write_tsv(thermal_complete_cases, self.outdir / "master_complete_cases_with_thermal.tsv")
-
-        self.export_species_merge_report(master, manifest_df, genome_sizes, species_mass, thermal_limits)
-        self.export_merge_diagnostics(master, manifest_df, genome_sizes, species_mass, thermal_limits)
+        self.export_species_merge_report(master, manifest_df, genome_sizes, species_mass)
+        self.export_merge_diagnostics(master, manifest_df, genome_sizes, species_mass)
 
 
     def export_species_merge_report(
@@ -821,7 +851,6 @@ class NhPhymlGcDivergence:
         manifest_df: Optional[pd.DataFrame],
         genome_sizes: Optional[pd.DataFrame],
         species_mass: Optional[pd.DataFrame],
-        thermal_limits: Optional[pd.DataFrame] = None,
     ) -> None:
         """
         Write a per-species report showing whether each master row matched
@@ -872,28 +901,6 @@ class NhPhymlGcDivergence:
             report["present_in_species_mass_tsv"] = False
             report["has_mass_value_before_user_overrides"] = False
 
-        if thermal_limits is not None and "genus_species" in thermal_limits.columns:
-            tmp = thermal_limits.copy()
-            tmp["genus_species"] = tmp["genus_species"].map(normalize_species_name)
-            thermal_species_any = set(tmp["genus_species"].dropna())
-            report["present_in_thermal_limits_tsv"] = report["genus_species"].isin(thermal_species_any)
-
-            if "ctmax" in tmp.columns:
-                ctmax_species_value = set(tmp.loc[tmp["ctmax"].notna(), "genus_species"].dropna())
-                report["has_ctmax_value"] = report["genus_species"].isin(ctmax_species_value)
-            else:
-                report["has_ctmax_value"] = False
-
-            if "ctmin" in tmp.columns:
-                ctmin_species_value = set(tmp.loc[tmp["ctmin"].notna(), "genus_species"].dropna())
-                report["has_ctmin_value"] = report["genus_species"].isin(ctmin_species_value)
-            else:
-                report["has_ctmin_value"] = False
-        else:
-            report["present_in_thermal_limits_tsv"] = False
-            report["has_ctmax_value"] = False
-            report["has_ctmin_value"] = False
-
         if "mass_preferred" in master.columns:
             report = report.merge(
                 master[["genus_species", "mass_preferred", "mass_source_preferred"]].drop_duplicates("genus_species"),
@@ -915,14 +922,6 @@ class NhPhymlGcDivergence:
                 how="left",
             )
 
-        thermal_value_cols = [c for c in ["genus_species", "ctmax", "ctmin"] if c in master.columns]
-        if len(thermal_value_cols) > 1:
-            report = report.merge(
-                master[thermal_value_cols].drop_duplicates("genus_species"),
-                on="genus_species",
-                how="left",
-            )
-
         write_tsv(report, self.outdir / "species_merge_report.tsv")
 
 
@@ -932,7 +931,6 @@ class NhPhymlGcDivergence:
         manifest_df: Optional[pd.DataFrame],
         genome_sizes: Optional[pd.DataFrame],
         species_mass: Optional[pd.DataFrame],
-        thermal_limits: Optional[pd.DataFrame] = None,
     ) -> None:
         rows = []
 
@@ -951,7 +949,7 @@ class NhPhymlGcDivergence:
         add("orthologs_analyzed", len(self.orthologs))
         add("species_with_gc_results", len(gc_species))
         add("rows_in_master_output", len(master))
-        for required_col in ["mean_gc3", "dianc", "genome_size", "mass_preferred", "ctmax", "ctmin"]:
+        for required_col in ["mean_gc3", "dianc", "genome_size", "mass_preferred"]:
             if required_col in master.columns:
                 add(f"master_rows_with_{required_col}", int(master[required_col].notna().sum()))
         complete_cols = [c for c in ["mean_gc3", "dianc", "genome_size", "mass_preferred"] if c in master.columns]
@@ -984,21 +982,25 @@ class NhPhymlGcDivergence:
                 .map(normalize_species_name)
             )
             add("species_with_preferred_mass_input", len(mass_species))
-            add("master_species_missing_preferred_mass", len(master_species - mass_species))
+            add("master_species_missing_preferred_mass_before_user_overrides", len(master_species - mass_species))
 
-        if thermal_limits is not None and "genus_species" in thermal_limits.columns:
-            tmp = thermal_limits.copy()
-            tmp["genus_species"] = tmp["genus_species"].map(normalize_species_name)
-
-            if "ctmax" in tmp.columns:
-                ctmax_species = set(tmp.loc[tmp["ctmax"].notna(), "genus_species"].dropna())
-                add("species_with_ctmax_input", len(ctmax_species))
-                add("master_species_missing_ctmax", len(master_species - ctmax_species))
-
-            if "ctmin" in tmp.columns:
-                ctmin_species = set(tmp.loc[tmp["ctmin"].notna(), "genus_species"].dropna())
-                add("species_with_ctmin_input", len(ctmin_species))
-                add("master_species_missing_ctmin", len(master_species - ctmin_species))
+        add(
+            "phrynocephalus_guinanensis_present_in_master",
+            "phrynocephalus_guinanensis" in master_species,
+        )
+        if "mass_preferred" in master.columns:
+            add("master_rows_with_mass_preferred_after_user_overrides", int(master["mass_preferred"].notna().sum()))
+            phryno_mask = master["genus_species"] == "phrynocephalus_guinanensis"
+            if phryno_mask.any():
+                add(
+                    "phrynocephalus_guinanensis_mass_preferred",
+                    master.loc[phryno_mask, "mass_preferred"].iloc[0],
+                )
+                if "mass_source_preferred" in master.columns:
+                    add(
+                        "phrynocephalus_guinanensis_mass_source",
+                        master.loc[phryno_mask, "mass_source_preferred"].iloc[0],
+                    )
 
         write_tsv(pd.DataFrame(rows), self.outdir / "master_merge_diagnostics.tsv")
 
@@ -1036,7 +1038,7 @@ class NhPhymlGcDivergence:
             chosen_frames.append(internal[internal["node_number"] == max_node].head(3))
 
         # Anolis example if represented in this subset.
-        anolis = df[df["child"].astype(str).str.lower().str.startswith("anolis_")].copy()
+        anolis = df[df["child"].astype(str).str.startswith("Anolis_")].copy()
         if not anolis.empty:
             chosen_frames.append(anolis.head(3))
 
@@ -1147,10 +1149,18 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--append-user-added-non-gc-rows",
+        action="store_true",
+        help=(
+            "Append user-curated mass rows even if the species was not present in the GC tree subset. "
+            "By default, master_output.tsv only includes species with calculated GC/divergence metrics."
+        ),
+    )
+    parser.add_argument(
         "--input-tsv-dir",
         type=Path,
         default=None,
-        help="Directory containing genome_sizes.tsv, species_mass.tsv, and thermal_limits.tsv. Default: <genomes_dir>/records/gc_metrics_inputs",
+        help="Directory containing genome_sizes.tsv and species_mass.tsv. Default: <genomes_dir>/records/gc_metrics_inputs",
     )
     parser.add_argument(
         "--outdir",
@@ -1207,6 +1217,7 @@ def main() -> None:
         input_tsv_dir=input_tsv_dir if input_tsv_dir.exists() else None,
         manifest=manifest,
         include_all_manifest_species=args.include_all_manifest_species,
+        append_user_added_non_gc_rows=args.append_user_added_non_gc_rows,
         tree_suffix=args.tree_suffix,
         lk_suffix=args.lk_suffix,
         strict=args.strict,
