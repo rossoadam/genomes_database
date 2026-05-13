@@ -4,13 +4,6 @@
 
 Create standardized TSV input files for the downstream GC divergence workflow.
 
-This version uses one canonical species key across all natural-history inputs:
-
-  species_normalized = genus_species in lowercase, e.g. crotalus_viridis
-
-The source-specific species columns are used only to construct and audit this key.
-They do not need to become separate columns in the final natural_history SQL table.
-
 Typical usage:
   python 03_make_master_input_tsvs.py /path/to/genomes \
     --manifest /path/to/project_manifest.csv \
@@ -24,76 +17,28 @@ Outputs, by default to <genomes_dir>/records/gc_metrics_inputs/:
   genome_sizes.tsv
   species_mass.tsv
   thermal_limits.tsv
-
-Each output includes species_normalized as the canonical join key.
-For temporary backward compatibility, genus_species is also included as an alias.
 """
 
 import argparse
 import csv
-import re
 from pathlib import Path
 from typing import Optional
 
 import pandas as pd
 
 
-BAD_SPECIES_TOKENS = {"sp", "sp.", "spp", "spp.", "cf", "cf.", "aff", "aff.", "nr", "nr."}
-HYBRID_MARKERS = {"x", "×"}
-
-
-def normalize_species_name(value: object) -> str:
-    """
-    Normalize a source species name to a canonical Genus_species key.
-
-    Rules:
-      - keep only the first two valid taxonomic tokens
-      - convert spaces to underscores
-      - lowercase the result
-      - drop qualifiers such as cf., aff., sp., spp.
-      - ignore subspecies/strain text after the binomial
-
-    Examples:
-      Crotalus viridis viridis  -> crotalus_viridis
-      Crotalus_viridis          -> crotalus_viridis
-      Crotalus cf. viridis      -> crotalus_viridis
-    """
-    if value is None or pd.isna(value):
-        return "unknown_species"
-
-    text = str(value).strip()
-    if not text or text.lower() in {"nan", "none", "na", "n/a"}:
-        return "unknown_species"
-
-    text = text.replace("_", " ")
-    text = re.sub(r"\([^)]*\)", " ", text)  # remove parenthetical notes
-    text = re.sub(r"\[[^]]*\]", " ", text)  # remove bracketed notes
-    text = re.sub(r"[^A-Za-z×x\s.-]", " ", text)
-    text = re.sub(r"\s+", " ", text).strip()
-
-    parts: list[str] = []
-    for token in text.split():
-        clean = token.strip().strip(".").lower()
-        if not clean:
-            continue
-        if clean in BAD_SPECIES_TOKENS:
-            continue
-        if clean in HYBRID_MARKERS:
-            continue
-        parts.append(clean)
+def normalize_species_name(organism_name: str) -> str:
+    organism_name = str(organism_name).strip()
+    if "_" in organism_name:
+        parts = [p for p in organism_name.split("_") if p]
+    else:
+        parts = organism_name.split()
 
     if len(parts) >= 2:
-        return f"{parts[0]}_{parts[1]}"
-    if len(parts) == 1:
-        return parts[0]
+        return f"{parts[0]}_{parts[1]}".lower()
+    elif len(parts) == 1:
+        return parts[0].lower()
     return "unknown_species"
-
-
-def add_genus_species_alias(df: pd.DataFrame) -> pd.DataFrame:
-    """Add genus_species as a temporary alias for older downstream scripts."""
-    if "species_normalized" in df.columns and "genus_species" not in df.columns:
-        df.insert(1, "genus_species", df["species_normalized"])
-    return df
 
 
 def read_table_auto(path: Path) -> pd.DataFrame:
@@ -191,7 +136,7 @@ def load_project_species(source_path: Path, source_label: str) -> pd.DataFrame:
     )
     species_key_col = choose_first_column(
         df,
-        ["species_normalized", "species_key", "genus_species", "genus_species_key", "normalized_species", "normalized_name"],
+        ["species_key", "genus_species", "genus_species_key", "normalized_species", "normalized_name"],
     )
     organism_col = choose_first_column(
         df,
@@ -201,18 +146,20 @@ def load_project_species(source_path: Path, source_label: str) -> pd.DataFrame:
 
     if species_key_col is None and organism_col is None:
         raise ValueError(
-            f"Could not find species key or organism/species column in {source_path}. "
+            f"Could not find species_key or organism/species column in {source_path}. "
             f"Columns found: {list(df.columns)}"
         )
 
     out = pd.DataFrame()
-    source_col = species_key_col if species_key_col is not None else organism_col
-    out["species_normalized"] = df[source_col].map(normalize_species_name)
+    if species_key_col is not None:
+        out["genus_species"] = df[species_key_col].map(normalize_species_name)
+    else:
+        out["genus_species"] = df[organism_col].map(normalize_species_name)
 
     if organism_col is not None:
         out["organism_name"] = df[organism_col].astype(str).str.strip()
     else:
-        out["organism_name"] = out["species_normalized"].str.replace("_", " ", regex=False)
+        out["organism_name"] = out["genus_species"].str.replace("_", " ", regex=False)
 
     if accession_col is not None:
         out["accession"] = df[accession_col].astype(str).str.strip()
@@ -220,17 +167,17 @@ def load_project_species(source_path: Path, source_label: str) -> pd.DataFrame:
         out["accession"] = pd.NA
 
     out["project_species_source"] = source_label
-    out = out[out["species_normalized"].astype(str).str.len() > 0]
-    out = out[out["species_normalized"] != "unknown_species"]
-    out = out.drop_duplicates(subset=["species_normalized"], keep="first")
-    return add_genus_species_alias(out)
+    out = out[out["genus_species"].astype(str).str.len() > 0]
+    out = out[out["genus_species"] != "unknown_species"]
+    out = out.drop_duplicates(subset=["genus_species"], keep="first")
+    return out
 
 
 def standardize_genome_size(path: Path, project_species: pd.DataFrame) -> pd.DataFrame:
     df = read_table_auto(path)
 
     cvalue_col = choose_first_column(df, ["mean_c_value_pg"])
-    species_key_col = choose_first_column(df, ["species_normalized", "species_key", "genus_species"])
+    species_key_col = choose_first_column(df, ["species_key", "genus_species"])
     species_name_col = choose_first_column(df, ["species_name", "organism_name", "organismName"])
     mean_mb_col = choose_first_column(df, ["mean_genome_mb"])
     mean_gb_col = choose_first_column(df, ["mean_genome_gb"])
@@ -238,16 +185,15 @@ def standardize_genome_size(path: Path, project_species: pd.DataFrame) -> pd.Dat
     if cvalue_col is None:
         raise ValueError(f"Could not find mean_c_value_pg in {path}. Columns found: {list(df.columns)}")
     if species_key_col is None and species_name_col is None:
-        raise ValueError(f"Could not find species key or species_name in {path}. Columns found: {list(df.columns)}")
+        raise ValueError(f"Could not find species_key or species_name in {path}. Columns found: {list(df.columns)}")
 
     rows = []
     for _, row in df.iterrows():
-        source_name = row[species_key_col] if species_key_col else row[species_name_col]
-        species_normalized = normalize_species_name(source_name)
+        genus_species = normalize_species_name(row[species_key_col] if species_key_col else row[species_name_col])
         rows.append(
             {
-                "species_normalized": species_normalized,
-                "species_name": row[species_name_col] if species_name_col else species_normalized.replace("_", " "),
+                "genus_species": genus_species,
+                "species_name": row[species_name_col] if species_name_col else genus_species.replace("_", " "),
                 "mean_c_value_pg": pd.to_numeric(row[cvalue_col], errors="coerce"),
                 "mean_genome_mb": pd.to_numeric(row[mean_mb_col], errors="coerce") if mean_mb_col else pd.NA,
                 "mean_genome_gb": pd.to_numeric(row[mean_gb_col], errors="coerce") if mean_gb_col else pd.NA,
@@ -256,68 +202,66 @@ def standardize_genome_size(path: Path, project_species: pd.DataFrame) -> pd.Dat
         )
 
     size_df = pd.DataFrame(rows)
-    size_df = size_df.dropna(subset=["species_normalized", "mean_c_value_pg"])
-    size_df = size_df[size_df["species_normalized"] != "unknown_species"]
-    size_df = size_df.drop_duplicates(subset=["species_normalized"], keep="first")
+    size_df = size_df.dropna(subset=["genus_species", "mean_c_value_pg"])
+    size_df = size_df[size_df["genus_species"] != "unknown_species"]
+    size_df = size_df.drop_duplicates(subset=["genus_species"], keep="first")
 
-    out = project_species[["species_normalized", "organism_name"]].copy()
-    out = out.merge(size_df, on="species_normalized", how="left")
-    out["species_name"] = out["species_name"].combine_first(out["organism_name"])
+    out = project_species[["genus_species"]].copy()
+    out = out.merge(size_df, on="genus_species", how="left")
     out["genome_size"] = out["mean_c_value_pg"]
-    out = add_genus_species_alias(out)
-    return out[["species_normalized", "genus_species", "organism_name", "species_name", "mean_c_value_pg",
-                "mean_genome_mb", "mean_genome_gb", "genome_size", "genome_size_source"]]
+    return out[["genus_species", "species_name", "mean_c_value_pg", "mean_genome_mb",
+                "mean_genome_gb", "genome_size", "genome_size_source"]]
 
 
 def standardize_meiri_mass(path: Path) -> pd.DataFrame:
     df = read_table_auto(path)
-    species_col = choose_first_column(df, ["binomial_2020", "binomial_(original files)", "species_normalized", "genus_species", "species", "species_name"])
+    species_col = choose_first_column(df, ["binomial_2020", "binomial_(original files)", "genus_species", "species", "species_name"])
     mass_col = choose_first_column(df, ["body mass (g)", "adult_body_mass (g)", "adult_body_mass_g", "mass"])
     if species_col is None or mass_col is None:
         raise ValueError(f"Could not identify Meiri species/mass columns in {path}. Columns found: {list(df.columns)}")
     out = pd.DataFrame()
-    out["species_normalized"] = df[species_col].map(normalize_species_name)
+    out["genus_species"] = df[species_col].map(normalize_species_name)
     out["mass_meiri"] = pd.to_numeric(df[mass_col], errors="coerce")
-    out = out.dropna(subset=["species_normalized", "mass_meiri"])
-    out = out[out["species_normalized"] != "unknown_species"]
-    return out.drop_duplicates(subset=["species_normalized"], keep="first")
+    out = out.dropna(subset=["genus_species", "mass_meiri"])
+    out = out[out["genus_species"] != "unknown_species"]
+    return out.drop_duplicates(subset=["genus_species"], keep="first")
 
 
 def standardize_title_mass(path: Path) -> pd.DataFrame:
     df = read_table_auto(path)
-    species_col = choose_first_column(df, ["treename", "species_normalized", "genus_species", "species", "species_name", "binomial"])
+    species_col = choose_first_column(df, ["treename", "genus_species", "species", "species_name", "binomial"])
     mass_col = choose_first_column(df, ["mass"])
     if species_col is None or mass_col is None:
         raise ValueError(f"Could not identify Title species/mass columns in {path}. Columns found: {list(df.columns)}")
     out = pd.DataFrame()
-    out["species_normalized"] = df[species_col].map(normalize_species_name)
+    out["genus_species"] = df[species_col].map(normalize_species_name)
     out["mass_title"] = pd.to_numeric(df[mass_col], errors="coerce")
-    out = out.dropna(subset=["species_normalized", "mass_title"])
-    out = out[out["species_normalized"] != "unknown_species"]
-    return out.drop_duplicates(subset=["species_normalized"], keep="first")
+    out = out.dropna(subset=["genus_species", "mass_title"])
+    out = out[out["genus_species"] != "unknown_species"]
+    return out.drop_duplicates(subset=["genus_species"], keep="first")
 
 
 def standardize_ji_mass(path: Path) -> pd.DataFrame:
     df = read_table_auto(path)
-    species_col = choose_first_column(df, ["species_normalized", "genus_species", "species_key", "species", "species_name", "binomial"])
+    species_col = choose_first_column(df, ["genus_species", "species_key", "species", "species_name", "binomial"])
     mass_col = choose_first_column(df, ["mass", "body_mass_g", "body mass (g)"])
     if species_col is None or mass_col is None:
         raise ValueError(f"Could not identify Ji species/mass columns in {path}. Columns found: {list(df.columns)}")
     out = pd.DataFrame()
-    out["species_normalized"] = df[species_col].map(normalize_species_name)
+    out["genus_species"] = df[species_col].map(normalize_species_name)
     out["mass_ji"] = pd.to_numeric(df[mass_col], errors="coerce")
-    out = out.dropna(subset=["species_normalized", "mass_ji"])
-    out = out[out["species_normalized"] != "unknown_species"]
-    return out.drop_duplicates(subset=["species_normalized"], keep="first")
+    out = out.dropna(subset=["genus_species", "mass_ji"])
+    out = out[out["genus_species"] != "unknown_species"]
+    return out.drop_duplicates(subset=["genus_species"], keep="first")
 
 
 def build_species_mass_tsv(project_species: pd.DataFrame, mass_meiri_path: Optional[Path],
                            mass_title_path: Optional[Path], mass_ji_path: Optional[Path]) -> pd.DataFrame:
-    out = project_species[["species_normalized"]].copy()
+    out = project_species[["genus_species"]].copy()
 
-    out = out.merge(standardize_meiri_mass(mass_meiri_path), on="species_normalized", how="left") if mass_meiri_path else out.assign(mass_meiri=pd.NA)
-    out = out.merge(standardize_ji_mass(mass_ji_path), on="species_normalized", how="left") if mass_ji_path else out.assign(mass_ji=pd.NA)
-    out = out.merge(standardize_title_mass(mass_title_path), on="species_normalized", how="left") if mass_title_path else out.assign(mass_title=pd.NA)
+    out = out.merge(standardize_meiri_mass(mass_meiri_path), on="genus_species", how="left") if mass_meiri_path else out.assign(mass_meiri=pd.NA)
+    out = out.merge(standardize_ji_mass(mass_ji_path), on="genus_species", how="left") if mass_ji_path else out.assign(mass_ji=pd.NA)
+    out = out.merge(standardize_title_mass(mass_title_path), on="genus_species", how="left") if mass_title_path else out.assign(mass_title=pd.NA)
 
     out["mass_preferred"] = out["mass_meiri"].combine_first(out["mass_ji"]).combine_first(out["mass_title"])
 
@@ -331,8 +275,7 @@ def build_species_mass_tsv(project_species: pd.DataFrame, mass_meiri_path: Optio
         return ""
 
     out["mass_source_preferred"] = out.apply(source, axis=1)
-    out = add_genus_species_alias(out)
-    return out[["species_normalized", "genus_species", "mass_meiri", "mass_ji", "mass_title", "mass_preferred", "mass_source_preferred"]]
+    return out[["genus_species", "mass_meiri", "mass_ji", "mass_title", "mass_preferred", "mass_source_preferred"]]
 
 
 def metric_is_critical_thermal_limit(value: object, desired: str) -> bool:
@@ -371,7 +314,7 @@ def standardize_bennett_thermal(path: Path) -> pd.DataFrame:
 
     rows = []
     for _, row in df.iterrows():
-        species_normalized = normalize_species_name(f"{row[genus_col]} {row[species_col]}")
+        genus_species = normalize_species_name(f"{row[genus_col]} {row[species_col]}")
 
         ctmax = pd.NA
         ctmin = pd.NA
@@ -384,7 +327,7 @@ def standardize_bennett_thermal(path: Path) -> pd.DataFrame:
 
         rows.append(
             {
-                "species_normalized": species_normalized,
+                "genus_species": genus_species,
                 "ctmax": ctmax,
                 "ctmax_metric": row[max_metric_col],
                 "ctmin": ctmin,
@@ -394,16 +337,16 @@ def standardize_bennett_thermal(path: Path) -> pd.DataFrame:
         )
 
     raw = pd.DataFrame(rows)
-    raw = raw[raw["species_normalized"] != "unknown_species"]
+    raw = raw[raw["genus_species"] != "unknown_species"]
 
     collapsed_rows = []
-    for species_normalized, group in raw.groupby("species_normalized", sort=True):
+    for genus_species, group in raw.groupby("genus_species", sort=True):
         ctmax_series = group["ctmax"].dropna()
         ctmin_series = group["ctmin"].dropna()
 
         collapsed_rows.append(
             {
-                "species_normalized": species_normalized,
+                "genus_species": genus_species,
                 "ctmax": ctmax_series.iloc[0] if len(ctmax_series) else pd.NA,
                 "ctmax_metric": group.loc[group["ctmax"].notna(), "ctmax_metric"].iloc[0] if len(ctmax_series) else "",
                 "ctmin": ctmin_series.iloc[0] if len(ctmin_series) else pd.NA,
@@ -417,9 +360,9 @@ def standardize_bennett_thermal(path: Path) -> pd.DataFrame:
 
 
 def build_thermal_limits_tsv(project_species: pd.DataFrame, thermal_bennett_path: Optional[Path]) -> pd.DataFrame:
-    out = project_species[["species_normalized"]].copy()
+    out = project_species[["genus_species"]].copy()
     if thermal_bennett_path:
-        out = out.merge(standardize_bennett_thermal(thermal_bennett_path), on="species_normalized", how="left")
+        out = out.merge(standardize_bennett_thermal(thermal_bennett_path), on="genus_species", how="left")
     else:
         out["ctmax"] = pd.NA
         out["ctmax_metric"] = ""
@@ -428,8 +371,7 @@ def build_thermal_limits_tsv(project_species: pd.DataFrame, thermal_bennett_path
         out["thermal_source"] = ""
         out["n_thermal_rows_for_species"] = pd.NA
 
-    out = add_genus_species_alias(out)
-    return out[["species_normalized", "genus_species", "ctmax", "ctmax_metric", "ctmin", "ctmin_metric", "thermal_source", "n_thermal_rows_for_species"]]
+    return out[["genus_species", "ctmax", "ctmax_metric", "ctmin", "ctmin_metric", "thermal_source", "n_thermal_rows_for_species"]]
 
 
 def parse_args() -> argparse.Namespace:
@@ -439,7 +381,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--genome-size", type=Path, default=None, help="C-value summary CSV/TSV with mean_c_value_pg.")
     parser.add_argument("--mass-meiri", type=Path, default=None, help="Meiri-style mass CSV/TSV.")
     parser.add_argument("--mass-title", type=Path, default=None, help="Title-style mass CSV/TSV.")
-    parser.add_argument("--mass-ji", type=Path, default=None, help="Ji et al. mass TSV with species and mass columns.")
+    parser.add_argument("--mass-ji", type=Path, default=None, help="Ji et al. mass TSV with genus_species and mass columns.")
     parser.add_argument("--thermal-bennett", type=Path, default=None, help="Bennett/GlobTherm-style thermal limits CSV/TSV.")
     parser.add_argument("--outdir", type=Path, default=None, help="Output directory. Default: <genomes_dir>/records/gc_metrics_inputs")
     parser.add_argument("--allow-missing-natural-history", action="store_true", help="Write blank values instead of failing if natural-history files are missing.")
@@ -487,8 +429,8 @@ def main() -> None:
     if genome_size_path:
         genome_size_df = standardize_genome_size(genome_size_path, project_species)
     else:
-        genome_size_df = project_species[["species_normalized", "genus_species", "organism_name"]].copy()
-        genome_size_df["species_name"] = genome_size_df["organism_name"]
+        genome_size_df = project_species[["genus_species"]].copy()
+        genome_size_df["species_name"] = pd.NA
         genome_size_df["mean_c_value_pg"] = pd.NA
         genome_size_df["mean_genome_mb"] = pd.NA
         genome_size_df["mean_genome_gb"] = pd.NA
@@ -522,7 +464,6 @@ def main() -> None:
 
     print("[DONE] Natural-history TSV input staging complete.")
     print(f"[INFO] Output directory: {outdir}")
-    print("[INFO] Canonical join key: species_normalized")
 
 
 if __name__ == "__main__":
