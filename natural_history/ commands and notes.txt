@@ -1,0 +1,79 @@
+Thank you for this script! Unless you think I should use a different manifest,
+I'd like to use the original mass_predicts_dna_dynamics_with_s_punctatus_manifest.csv for this project and pick 5 genomes from the manifest.
+
+The default 5 genomes can be
+
+GCA_039797435.1
+GCA_051312515.2
+GCF_035046505.1
+GCA_053572275.1
+GCF_028583425.1
+
+1) let's first create tables for sequences, species_name_audit, natural_history, genomes 
+by modifying the numos script and uploading the species_name_audit and natural_history tables to sql.
+To create the the genomes and sequences tables, let's use the load_genome_pyfaidx.py functions to allow for quick access to the genomes
+Populate the gc values with null for now. In the future we can get the sequence.gc values after calculating gc of the windows tables.
+I am attaching the files that I think are relevant to you making a script.
+numos
+load_genome_pyfaidx.py
+natural_history.tsv
+species_name_audit.tsv
+20251111_numos-genbank_introns.py
+please write the output tsvs to genomes/records/sql_tsvs/
+gc3_dynamics_v3.sql
+
+Additionally, I'd like populate the tables that hold primary keys for any foreign keys in the windows tables.
+So for example, in the genomes table, genome_pk is the primary key. 
+To understand how the windows tables will interact with the other tables, I'd like these to be populated.
+This makes sense to me since these tables should not contain much information.
+This means the tables sequences, analysis_run, species_name_audit, natural_history should all be populated in addition to all the windows tables.
+In fact, let's first create tables for sequences, species_name_audit, natural_history, genomes 
+by modifying the numos script and uploading the species_name_audit and tables natural_history to sql.
+I am attaching the files that I think are relevant to you making a script tha
+
+/Users/rossoaa/projects/genomes/GCF_964194415.1/ncbi_dataset/data
+
+
+/Users/rossoaa/projects/genomes/GCA_964106635.2/ncbi_dataset/data/GCA_964106635.2/GCA_964106635.2_rPodPit1.hap2.2_genomic.fna
+
+/Users/rossoaa/projects/genomes/records/sql_tsvs
+
+/Users/rossoaa/projects/genomes/records/sql_tsvs/gc3_dynamics_v3.sql
+
+python3 00_build_starter_sql_tsvs_v12.py --genomes-dir /Users/rossoaa/projects/genomes --manifest /Users/rossoaa/projects/genomes/records/project_manifests/mass_predicts_dna_dynamics_with_s_punctatus_manifest.csv
+
+python3 01_load_starter_sql_tsvs.py --tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs --mysql-db gc3_test --mysql-user root
+
+
+Let's now combine the 3 scripts attached to complete our goal.
+Goal:
+    Calculate GC4 for each sequence in an alignment at sites where nucleotides are not ambiguous.
+
+Pseudo-script
+
+1) Parse fasta
+2) make mask for sites
+3) make mask for codons
+4) make mask for GC4 sites
+	-here I am realizing this should also be a cumulative mask. I will explain below 
+	-For a given GC4 site, its codon needs to be evaluated to make sure it is GC4 across all sequences
+	-if it is not GC4 across all sequences, the codon should be masked
+5) use codon mask and GC4 mask to mask all the alignments
+6) calculate GC4
+7) return a tsv with summary values for each nucleotide and the number of codons / nucleotides dropped and why
+
+Thanks can you now update this script so that it does all alignments in a directory?
+To be clear, the logic should be the same:
+
+parse FASTA
+make cumulative valid-site mask
+make complete-codon mask
+make cumulative GC4 mask across all sequences
+calculate per-sequence GC4
+write TSV summaries
+
+It should do this for each alignment that is contained in each fasta file.
+At the end it should return one file with a detailed summary tsv and 2
+Summary with gc4 values for each species.
+
+Is this clear?
