@@ -144,7 +144,7 @@ def connect(args: argparse.Namespace) -> pymysql.connections.Connection:
         password=get_password(args),
         database=args.database,
         charset="utf8mb4",
-        local_infile=True if args.local_infile else False,
+        local_infile=True,
         autocommit=False,
         cursorclass=pymysql.cursors.DictCursor,
     )
