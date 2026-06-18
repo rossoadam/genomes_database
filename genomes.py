@@ -392,7 +392,7 @@ class GenomeManagerHybrid:
                 continue
             
             name = path.name
-            if name.endswith(".fna") and accession in name:
+            if name.endswith("genomic.fna") and accession in name:
                 fna_path = str(path)
             elif name.endswith(".gff") and "lift" not in name:
                 gff_path = str(path)
