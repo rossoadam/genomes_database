@@ -4,7 +4,7 @@
 # install.packages('phytools')
 # install.packages('ape')
 # install.packages("MuMIn")  # only if not installed
-install.packages("AED")  # only if not installed
+# install.packages("AED")  # only if not installed
 library('MuMIn')
 library('phytools')
 library('ape')
@@ -14,8 +14,8 @@ library('rcompanion')
 library('AED') # couldn't get this working so I am just going to use the base r
 
 tree_path = "~/projects/genomes/records/compleasm/alignments/t1.0_e1_o7_with_s_punctatus/06c_rooted_tree_for_pgls/rev_dna_renamed_keep_lengths_pgls_altered.rooted_renamed.nwk"
-master_ouput_path = "~/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/gc_metrics_outputs/master_output.tsv"
-outdir="~/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/figures"
+master_ouput_path = "/Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o7_with_s_punctatus/11_final_outputs/gc_metrics_outputs/master_output.tsv"
+outdir="/Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o7_with_s_punctatus/11_final_outputs/figures"
 # most recently gc4 results were included in the master out. old results were moved to an archive file
 setwd(outdir)
 
@@ -40,11 +40,11 @@ hist(data[,c("genome_size")])             # appears normal
 hist(data[,c("ctmax")])                   # appears normal
 
 # do the transformations suggested above
-mass_vector <- setNames(data$mass_preferred,order_)
+mass_vector <- setNames(data$mass_preferred, order_)
 log_mass_vector <- log(mass_vector, base = 10)
 data$log_mass = log_mass_vector
 
-svl_vector <- setNames(data$svl_mm_title,order_)
+svl_vector <- setNames(data$max_female_length_svl_mm_title, order_)
 log_svl_vector <- log(svl_vector, base = 10)
 data$log_svl_title <- log_svl_vector
 
@@ -136,11 +136,24 @@ plot(data[,c("gc4","ctmax")])
 # gc vs sd
 plot(data[,c("mean_gc3","sd_gc3")])
 
-vars1 <- c("mean_gc3","log_svl_title","log_longevity","log_annual_eggs")
+vars_natural_history_gc3 <- c("mean_gc3","log_svl_title","log_longevity","log_annual_eggs")
+vars_natural_history_gc4 <- c("gc4","log_svl_title","log_longevity","log_annual_eggs")
+data_nh_gc3 <- na.omit(data[,vars_natural_history_gc3])
+data_nh_gc4 <- na.omit(data[,vars_natural_history_gc4])
 vars2 <- c("mean_gc3","log_svl_title","log_longevity","log_annual_eggs","genome_size","ctmax")
 
-sum(complete.cases(data[, vars1]))
-sum(complete.cases(data[, vars2]))
+sum(complete.cases(data[, vars_natural_history_gc3]))
+sum(complete.cases(data[, vars_natural_history_gc4]))
+
+# new cor variable:
+data_nh_gc3 <- na.omit(data[, vars_natural_history_gc3])
+rownames(data_nh_gc3) <- data_nh_gc3$species_normalized
+tree_nh_gc3 <- drop.tip(
+  tree,
+  setdiff(tree$tip.label, data_nh_gc3$species_normalized)
+)
+data_nh_gc3 <- data_nh_gc3[tree_nh_gc3$tip.label, ]
+
 
 # convert phylogenetic tree into a special type of R object called a correlation structure
 corBM <- corBrownian(phy=tree, form= ~order_)
@@ -162,8 +175,17 @@ model_gls_svl_1_gc4 <- gls(gc4 ~ log_svl_vector , data=data, correlation = corBM
 summary(model_gls_svl_1_gc4)
 model_gls_egg_3_gc3 <- gls(mean_gc3 ~ annual_egg_vector + genome_size + ctmax, data=data, correlation = corBM, method="ML", na.action=na.omit)
 
-model_gls_natural_history_3_gc3 <- gls(mean_gc3 ~ log_svl_vector + log_annual_eggs + log_longevity, data=data, correlation = corBM, method="ML", na.action=na.omit)
-summary(model_gls_svl_3_gc3)
+model_gls_natural_history_3_gc3 <- gls(mean_gc3 ~ log_svl_title + log_annual_eggs + log_longevity, data=data_nh_gc3, correlation = corBM, method="ML", na.action=na.omit)
+summary(model_gls_natural_history_3_gc3)
+
+model_gls_natural_history_2_gc3 <- gls(mean_gc3 ~ log_svl_title + log_longevity, data=data_nh_gc3, correlation = corBM, method="ML", na.action=na.omit)
+summary(model_gls_natural_history_2_gc3)
+
+model_gls_natural_history_1_gc3 <- gls(mean_gc3 ~ log_svl_vector , data=data_nh_gc3, correlation = corBM, method="ML", na.action=na.omit)
+summary(model_gls_natural_history_1_gc3)
+
+
+
 
 
 

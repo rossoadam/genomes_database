@@ -129,34 +129,6 @@ def write_json(obj: object, path: Path) -> None:
     path.write_text(json.dumps(obj, indent=4, ensure_ascii=False), encoding="utf-8")
 
 
-
-def ensure_genus_species_key(df: pd.DataFrame, context: str) -> pd.DataFrame:
-    """
-    Ensure a dataframe has the legacy/internal genus_species merge key.
-
-    Newer natural-history staging files use species_normalized as the canonical
-    key. Older GC divergence code used genus_species internally. This helper
-    accepts either spelling and normalizes the key for safe merges.
-    """
-    df = df.copy()
-
-    if "genus_species" in df.columns:
-        key_col = "genus_species"
-    elif "species_normalized" in df.columns:
-        key_col = "species_normalized"
-    elif "sequence_id" in df.columns:
-        key_col = "sequence_id"
-    else:
-        raise ValueError(
-            f"Could not find a species merge key in {context}. Expected one of: "
-            "genus_species, species_normalized, sequence_id. "
-            f"Columns found: {list(df.columns)}"
-        )
-
-    df["genus_species"] = df[key_col].map(normalize_species_name)
-    df = df[df["genus_species"] != "unknown_species"]
-    return df
-
 def coerce_node_name(value: object) -> str:
     if pd.isna(value):
         return ""
@@ -407,7 +379,6 @@ class NhPhymlGcDivergence:
         tree_suffix: str = ".phylip_nhPhymlGC.tree",
         lk_suffix: str = ".phylip_nhPhyml.lk",
         strict: bool = False,
-        gc4_species_summary: Optional[Path] = None,
     ) -> None:
         self.genomes_dir = genomes_dir
         self.number_of_species = number_of_species
@@ -421,7 +392,6 @@ class NhPhymlGcDivergence:
         self.tree_suffix = tree_suffix
         self.lk_suffix = lk_suffix
         self.strict = strict
-        self.gc4_species_summary = gc4_species_summary
 
         self.tree_files: Dict[str, Path] = {}
         self.lk_files: Dict[str, Path] = {}
@@ -687,7 +657,8 @@ class NhPhymlGcDivergence:
 
         genome_sizes = self.read_input_tsv("genome_sizes.tsv")
         if genome_sizes is not None:
-            genome_sizes = ensure_genus_species_key(genome_sizes, "genome_sizes.tsv")
+            genome_sizes = genome_sizes.copy()
+            genome_sizes["genus_species"] = genome_sizes["genus_species"].map(normalize_species_name)
             keep = [
                 c
                 for c in [
@@ -708,29 +679,17 @@ class NhPhymlGcDivergence:
 
         species_mass = self.read_input_tsv("species_mass.tsv")
         if species_mass is not None:
-            species_mass = ensure_genus_species_key(species_mass, "species_mass.tsv")
+            species_mass = species_mass.copy()
+            species_mass["genus_species"] = species_mass["genus_species"].map(normalize_species_name)
             keep = [
                 c
                 for c in [
                     "genus_species",
-                    # Current trait/mass columns from 03_make_master_input_tsvs.py
-                    "mass_grams_oskyrko",
-                    "mass_grams_title",
-                    "mass_grams_ji",
-                    "mass_preferred",
-                    "mass_source_preferred",
-                    "max_female_length_svl_mm_oskyrko",
-                    "largest_clutch_size",
-                    "mean_number_of_eggs_per_clutch",
-                    "annual_number_of_eggs",
-                    "max_longevity_years",
-                    "number_clutches_per_year",
-                    "max_female_length_svl_mm_title",
-                    "range_size",
-                    # Backward-compatible columns from older species_mass.tsv files
                     "mass_meiri",
                     "mass_ji",
                     "mass_title",
+                    "mass_preferred",
+                    "mass_source_preferred",
                 ]
                 if c in species_mass.columns
             ]
@@ -742,7 +701,8 @@ class NhPhymlGcDivergence:
 
         thermal_limits = self.read_input_tsv("thermal_limits.tsv")
         if thermal_limits is not None:
-            thermal_limits = ensure_genus_species_key(thermal_limits, "thermal_limits.tsv")
+            thermal_limits = thermal_limits.copy()
+            thermal_limits["genus_species"] = thermal_limits["genus_species"].map(normalize_species_name)
             keep = [
                 c
                 for c in [
@@ -758,27 +718,6 @@ class NhPhymlGcDivergence:
             ]
             master = master.merge(
                 thermal_limits[keep].drop_duplicates("genus_species"),
-                on="genus_species",
-                how="left",
-            )
-
-        gc4_summary = None
-        if self.gc4_species_summary is not None:
-            if not self.gc4_species_summary.exists():
-                raise FileNotFoundError(f"GC4 species summary does not exist: {self.gc4_species_summary}")
-            gc4_summary = read_table_auto(self.gc4_species_summary)
-            gc4_summary = ensure_genus_species_key(gc4_summary, str(self.gc4_species_summary))
-            gc4_col = choose_first_column(gc4_summary, ["gc4"])
-            if gc4_col is None:
-                raise ValueError(
-                    f"Could not find gc4 column in {self.gc4_species_summary}. "
-                    f"Columns found: {list(gc4_summary.columns)}"
-                )
-            gc4_keep = gc4_summary[["genus_species", gc4_col]].copy()
-            gc4_keep = gc4_keep.rename(columns={gc4_col: "gc4"})
-            gc4_keep["gc4"] = pd.to_numeric(gc4_keep["gc4"], errors="coerce")
-            master = master.merge(
-                gc4_keep.drop_duplicates("genus_species"),
                 on="genus_species",
                 how="left",
             )
@@ -832,28 +771,16 @@ class NhPhymlGcDivergence:
             "mean_gc3",
             "sd_gc3",
             "n_orthologs",
-            "gc4",
             "dianc",
             "mean_c_value_pg",
             "mean_genome_mb",
             "mean_genome_gb",
             "genome_size",
-            "mass_grams_oskyrko",
-            "mass_grams_title",
-            "mass_grams_ji",
-            "mass_preferred",
-            "mass_source_preferred",
-            "max_female_length_svl_mm_oskyrko",
-            "largest_clutch_size",
-            "mean_number_of_eggs_per_clutch",
-            "annual_number_of_eggs",
-            "max_longevity_years",
-            "number_clutches_per_year",
-            "max_female_length_svl_mm_title",
-            "range_size",
             "mass_meiri",
             "mass_ji",
             "mass_title",
+            "mass_preferred",
+            "mass_source_preferred",
             "ctmax",
             "ctmax_metric",
             "ctmin",
@@ -884,8 +811,8 @@ class NhPhymlGcDivergence:
             thermal_complete_cases = master.dropna(subset=thermal_complete_cols).copy()
             write_tsv(thermal_complete_cases, self.outdir / "master_complete_cases_with_thermal.tsv")
 
-        self.export_species_merge_report(master, manifest_df, genome_sizes, species_mass, thermal_limits, gc4_summary)
-        self.export_merge_diagnostics(master, manifest_df, genome_sizes, species_mass, thermal_limits, gc4_summary)
+        self.export_species_merge_report(master, manifest_df, genome_sizes, species_mass, thermal_limits)
+        self.export_merge_diagnostics(master, manifest_df, genome_sizes, species_mass, thermal_limits)
 
 
     def export_species_merge_report(
@@ -895,7 +822,6 @@ class NhPhymlGcDivergence:
         genome_sizes: Optional[pd.DataFrame],
         species_mass: Optional[pd.DataFrame],
         thermal_limits: Optional[pd.DataFrame] = None,
-        gc4_summary: Optional[pd.DataFrame] = None,
     ) -> None:
         """
         Write a per-species report showing whether each master row matched
@@ -918,8 +844,9 @@ class NhPhymlGcDivergence:
         else:
             report["present_in_manifest_or_compleasm_metadata"] = False
 
-        if genome_sizes is not None and ("genus_species" in genome_sizes.columns or "species_normalized" in genome_sizes.columns):
-            tmp = ensure_genus_species_key(genome_sizes, "genome_sizes.tsv")
+        if genome_sizes is not None and "genus_species" in genome_sizes.columns:
+            tmp = genome_sizes.copy()
+            tmp["genus_species"] = tmp["genus_species"].map(normalize_species_name)
             size_species_any = set(tmp["genus_species"].dropna())
             if "genome_size" in tmp.columns:
                 size_species_value = set(tmp.loc[tmp["genome_size"].notna(), "genus_species"].dropna())
@@ -931,8 +858,9 @@ class NhPhymlGcDivergence:
             report["present_in_genome_sizes_tsv"] = False
             report["has_genome_size_value"] = False
 
-        if species_mass is not None and ("genus_species" in species_mass.columns or "species_normalized" in species_mass.columns):
-            tmp = ensure_genus_species_key(species_mass, "species_mass.tsv")
+        if species_mass is not None and "genus_species" in species_mass.columns:
+            tmp = species_mass.copy()
+            tmp["genus_species"] = tmp["genus_species"].map(normalize_species_name)
             mass_species_any = set(tmp["genus_species"].dropna())
             if "mass_preferred" in tmp.columns:
                 mass_species_value = set(tmp.loc[tmp["mass_preferred"].notna(), "genus_species"].dropna())
@@ -944,8 +872,9 @@ class NhPhymlGcDivergence:
             report["present_in_species_mass_tsv"] = False
             report["has_mass_value_before_user_overrides"] = False
 
-        if thermal_limits is not None and ("genus_species" in thermal_limits.columns or "species_normalized" in thermal_limits.columns):
-            tmp = ensure_genus_species_key(thermal_limits, "thermal_limits.tsv")
+        if thermal_limits is not None and "genus_species" in thermal_limits.columns:
+            tmp = thermal_limits.copy()
+            tmp["genus_species"] = tmp["genus_species"].map(normalize_species_name)
             thermal_species_any = set(tmp["genus_species"].dropna())
             report["present_in_thermal_limits_tsv"] = report["genus_species"].isin(thermal_species_any)
 
@@ -965,23 +894,9 @@ class NhPhymlGcDivergence:
             report["has_ctmax_value"] = False
             report["has_ctmin_value"] = False
 
-        if gc4_summary is not None and ("sequence_id" in gc4_summary.columns or "genus_species" in gc4_summary.columns or "species_normalized" in gc4_summary.columns):
-            tmp = ensure_genus_species_key(gc4_summary, "gc4_species_summary.tsv")
-            gc4_species_any = set(tmp["genus_species"].dropna())
-            if "gc4" in tmp.columns:
-                gc4_species_value = set(tmp.loc[pd.to_numeric(tmp["gc4"], errors="coerce").notna(), "genus_species"].dropna())
-            else:
-                gc4_species_value = gc4_species_any
-            report["present_in_gc4_species_summary"] = report["genus_species"].isin(gc4_species_any)
-            report["has_gc4_value"] = report["genus_species"].isin(gc4_species_value)
-        else:
-            report["present_in_gc4_species_summary"] = False
-            report["has_gc4_value"] = False
-
-        mass_value_cols = [c for c in ["genus_species", "mass_preferred", "mass_source_preferred"] if c in master.columns]
-        if "mass_preferred" in mass_value_cols:
+        if "mass_preferred" in master.columns:
             report = report.merge(
-                master[mass_value_cols].drop_duplicates("genus_species"),
+                master[["genus_species", "mass_preferred", "mass_source_preferred"]].drop_duplicates("genus_species"),
                 on="genus_species",
                 how="left",
             )
@@ -1018,7 +933,6 @@ class NhPhymlGcDivergence:
         genome_sizes: Optional[pd.DataFrame],
         species_mass: Optional[pd.DataFrame],
         thermal_limits: Optional[pd.DataFrame] = None,
-        gc4_summary: Optional[pd.DataFrame] = None,
     ) -> None:
         rows = []
 
@@ -1056,22 +970,25 @@ class NhPhymlGcDivergence:
 
         if genome_sizes is not None and "genome_size" in genome_sizes.columns:
             size_species = set(
-                ensure_genus_species_key(genome_sizes, "genome_sizes.tsv").loc[lambda d: d["genome_size"].notna(), "genus_species"]
+                genome_sizes.loc[genome_sizes["genome_size"].notna(), "genus_species"]
                 .dropna()
+                .map(normalize_species_name)
             )
             add("species_with_genome_size_input", len(size_species))
             add("master_species_missing_genome_size", len(master_species - size_species))
 
         if species_mass is not None and "mass_preferred" in species_mass.columns:
             mass_species = set(
-                ensure_genus_species_key(species_mass, "species_mass.tsv").loc[lambda d: d["mass_preferred"].notna(), "genus_species"]
+                species_mass.loc[species_mass["mass_preferred"].notna(), "genus_species"]
                 .dropna()
+                .map(normalize_species_name)
             )
             add("species_with_preferred_mass_input", len(mass_species))
             add("master_species_missing_preferred_mass", len(master_species - mass_species))
 
-        if thermal_limits is not None and ("genus_species" in thermal_limits.columns or "species_normalized" in thermal_limits.columns):
-            tmp = ensure_genus_species_key(thermal_limits, "thermal_limits.tsv")
+        if thermal_limits is not None and "genus_species" in thermal_limits.columns:
+            tmp = thermal_limits.copy()
+            tmp["genus_species"] = tmp["genus_species"].map(normalize_species_name)
 
             if "ctmax" in tmp.columns:
                 ctmax_species = set(tmp.loc[tmp["ctmax"].notna(), "genus_species"].dropna())
@@ -1082,16 +999,6 @@ class NhPhymlGcDivergence:
                 ctmin_species = set(tmp.loc[tmp["ctmin"].notna(), "genus_species"].dropna())
                 add("species_with_ctmin_input", len(ctmin_species))
                 add("master_species_missing_ctmin", len(master_species - ctmin_species))
-
-        if gc4_summary is not None:
-            tmp = ensure_genus_species_key(gc4_summary, "gc4_species_summary.tsv")
-            add("species_in_gc4_species_summary", int(tmp["genus_species"].dropna().nunique()))
-            if "gc4" in tmp.columns:
-                gc4_species = set(tmp.loc[pd.to_numeric(tmp["gc4"], errors="coerce").notna(), "genus_species"].dropna())
-                add("species_with_gc4_input", len(gc4_species))
-                add("master_species_missing_gc4", len(master_species - gc4_species))
-            if "gc4" in master.columns:
-                add("master_rows_with_gc4", int(master["gc4"].notna().sum()))
 
         write_tsv(pd.DataFrame(rows), self.outdir / "master_merge_diagnostics.tsv")
 
@@ -1246,15 +1153,6 @@ def parse_args() -> argparse.Namespace:
         help="Directory containing genome_sizes.tsv, species_mass.tsv, and thermal_limits.tsv. Default: <genomes_dir>/records/gc_metrics_inputs",
     )
     parser.add_argument(
-        "--gc4-species-summary",
-        type=Path,
-        default=None,
-        help=(
-            "Optional gc4_species_summary.tsv from 16_gc4_from_alignment.py. "
-            "The gc4 column is merged into master_output.tsv using sequence_id/species_normalized."
-        ),
-    )
-    parser.add_argument(
         "--outdir",
         type=Path,
         default=None,
@@ -1312,7 +1210,6 @@ def main() -> None:
         tree_suffix=args.tree_suffix,
         lk_suffix=args.lk_suffix,
         strict=args.strict,
-        gc4_species_summary=args.gc4_species_summary.expanduser().resolve() if args.gc4_species_summary else None,
     )
 
     calculator.run()

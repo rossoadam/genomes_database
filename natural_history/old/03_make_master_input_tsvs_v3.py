@@ -4,15 +4,21 @@
 
 Create standardized TSV input files for the downstream GC divergence workflow.
 
-Canonical species key:
+This version uses one canonical species key across all natural-history inputs:
+
   species_normalized = genus_species in lowercase, e.g. crotalus_viridis
 
-This version can stage natural-history predictors from:
-  - genome-size/C-value summaries
-  - Oskyrko et al. 2024 ReptTraits (--traits-oskyrko)
-  - Title et al. macroevolutionary dataset (--mass-title / title_et_al_data.csv)
-  - Ji-style mass data (--mass-ji)
-  - Bennett/GlobTherm thermal limits
+The source-specific species columns are used only to construct and audit this key.
+They do not need to become separate columns in the final natural_history SQL table.
+
+Typical usage:
+  python 03_make_master_input_tsvs.py /path/to/genomes \
+    --manifest /path/to/project_manifest.csv \
+    --genome-size /path/to/reptile_c_value_summary.csv \
+    --mass-meiri /path/to/meiri.csv \
+    --mass-title /path/to/title.csv \
+    --mass-ji /path/to/ji.tsv \
+    --thermal-bennett /path/to/bennett.csv
 
 Outputs, by default to <genomes_dir>/records/gc_metrics_inputs/:
   genome_sizes.tsv
@@ -36,22 +42,6 @@ BAD_SPECIES_TOKENS = {"sp", "sp.", "spp", "spp.", "cf", "cf.", "aff", "aff.", "n
 HYBRID_MARKERS = {"x", "×"}
 
 
-OSKYRKO_COLUMNS = {
-    "max_female_length_svl_mm_oskyrko": 'Maximum female length ("SVL", mm)/straight carapace length for turtles ("SCL", mm)',
-    "largest_clutch_size": "Largest clutch size",
-    "mean_number_of_eggs_per_clutch": "Mean number of offspring per litter or number of eggs per clutch",
-    "max_longevity_years": "Maximum Longevity (years)",
-    "mass_grams_oskyrko": "Maximum body mass (g)",
-    "number_clutches_per_year": "Number of litters or clutches produced per year",
-}
-
-TITLE_COLUMNS = {
-    "mass_grams_title": "mass",
-    "svl_mm_title": "completeSVL",
-    "range_size": "rangeSize",
-}
-
-
 def normalize_species_name(value: object) -> str:
     """
     Normalize a source species name to a canonical Genus_species key.
@@ -62,6 +52,11 @@ def normalize_species_name(value: object) -> str:
       - lowercase the result
       - drop qualifiers such as cf., aff., sp., spp.
       - ignore subspecies/strain text after the binomial
+
+    Examples:
+      Crotalus viridis viridis  -> crotalus_viridis
+      Crotalus_viridis          -> crotalus_viridis
+      Crotalus cf. viridis      -> crotalus_viridis
     """
     if value is None or pd.isna(value):
         return "unknown_species"
@@ -71,8 +66,8 @@ def normalize_species_name(value: object) -> str:
         return "unknown_species"
 
     text = text.replace("_", " ")
-    text = re.sub(r"\([^)]*\)", " ", text)
-    text = re.sub(r"\[[^]]*\]", " ", text)
+    text = re.sub(r"\([^)]*\)", " ", text)  # remove parenthetical notes
+    text = re.sub(r"\[[^]]*\]", " ", text)  # remove bracketed notes
     text = re.sub(r"[^A-Za-z×x\s.-]", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
 
@@ -95,6 +90,7 @@ def normalize_species_name(value: object) -> str:
 
 
 def add_genus_species_alias(df: pd.DataFrame) -> pd.DataFrame:
+    """Add genus_species as a temporary alias for older downstream scripts."""
     if "species_normalized" in df.columns and "genus_species" not in df.columns:
         df.insert(1, "genus_species", df["species_normalized"])
     return df
@@ -126,13 +122,6 @@ def choose_first_column(df: pd.DataFrame, candidates: list[str]) -> Optional[str
         if key in cleaned_to_real:
             return cleaned_to_real[key]
     return None
-
-
-def require_column(df: pd.DataFrame, candidates: list[str], label: str, path: Path) -> str:
-    col = choose_first_column(df, candidates)
-    if col is None:
-        raise ValueError(f"Could not identify {label} column in {path}. Columns found: {list(df.columns)}")
-    return col
 
 
 def default_compleasm_metadata(genomes_dir: Path) -> Path:
@@ -280,61 +269,32 @@ def standardize_genome_size(path: Path, project_species: pd.DataFrame) -> pd.Dat
                 "mean_genome_mb", "mean_genome_gb", "genome_size", "genome_size_source"]]
 
 
-def collapse_numeric_by_species(df: pd.DataFrame, value_cols: list[str]) -> pd.DataFrame:
-    """Collapse duplicate species rows by taking the first non-null value per column."""
-    rows = []
-    for species_normalized, group in df.groupby("species_normalized", sort=True):
-        row = {"species_normalized": species_normalized}
-        for col in value_cols:
-            nonnull = group[col].dropna()
-            row[col] = nonnull.iloc[0] if len(nonnull) else pd.NA
-        rows.append(row)
-    return pd.DataFrame(rows)
-
-
-def standardize_oskyrko_traits(path: Path) -> pd.DataFrame:
+def standardize_meiri_mass(path: Path) -> pd.DataFrame:
     df = read_table_auto(path)
-    species_col = require_column(
-        df,
-        ["Species", "species", "species_normalized", "genus_species", "species_name", "binomial"],
-        "Oskyrko/ReptTraits species",
-        path,
-    )
-
-    missing = [source_col for source_col in OSKYRKO_COLUMNS.values() if choose_first_column(df, [source_col]) is None]
-    if missing:
-        raise ValueError(f"Missing required Oskyrko/ReptTraits columns in {path}: {missing}. Columns found: {list(df.columns)}")
-
+    species_col = choose_first_column(df, ["binomial_2020", "binomial_(original files)", "species_normalized", "genus_species", "species", "species_name"])
+    mass_col = choose_first_column(df, ["body mass (g)", "adult_body_mass (g)", "adult_body_mass_g", "mass"])
+    if species_col is None or mass_col is None:
+        raise ValueError(f"Could not identify Meiri species/mass columns in {path}. Columns found: {list(df.columns)}")
     out = pd.DataFrame()
     out["species_normalized"] = df[species_col].map(normalize_species_name)
-    for new_col, source_col in OSKYRKO_COLUMNS.items():
-        real_col = require_column(df, [source_col], source_col, path)
-        out[new_col] = pd.to_numeric(df[real_col], errors="coerce")
-
+    out["mass_meiri"] = pd.to_numeric(df[mass_col], errors="coerce")
+    out = out.dropna(subset=["species_normalized", "mass_meiri"])
     out = out[out["species_normalized"] != "unknown_species"]
-    return collapse_numeric_by_species(out, list(OSKYRKO_COLUMNS.keys()))
+    return out.drop_duplicates(subset=["species_normalized"], keep="first")
 
 
-def standardize_title_traits(path: Path) -> pd.DataFrame:
+def standardize_title_mass(path: Path) -> pd.DataFrame:
     df = read_table_auto(path)
-    species_col = require_column(
-        df,
-        ["treename", "species_normalized", "genus_species", "species", "species_name", "binomial"],
-        "Title species",
-        path,
-    )
-
+    species_col = choose_first_column(df, ["treename", "species_normalized", "genus_species", "species", "species_name", "binomial"])
+    mass_col = choose_first_column(df, ["mass"])
+    if species_col is None or mass_col is None:
+        raise ValueError(f"Could not identify Title species/mass columns in {path}. Columns found: {list(df.columns)}")
     out = pd.DataFrame()
     out["species_normalized"] = df[species_col].map(normalize_species_name)
-    for new_col, source_col in TITLE_COLUMNS.items():
-        real_col = choose_first_column(df, [source_col])
-        if real_col is None:
-            out[new_col] = pd.NA
-        else:
-            out[new_col] = pd.to_numeric(df[real_col], errors="coerce")
-
+    out["mass_title"] = pd.to_numeric(df[mass_col], errors="coerce")
+    out = out.dropna(subset=["species_normalized", "mass_title"])
     out = out[out["species_normalized"] != "unknown_species"]
-    return collapse_numeric_by_species(out, list(TITLE_COLUMNS.keys()))
+    return out.drop_duplicates(subset=["species_normalized"], keep="first")
 
 
 def standardize_ji_mass(path: Path) -> pd.DataFrame:
@@ -345,75 +305,34 @@ def standardize_ji_mass(path: Path) -> pd.DataFrame:
         raise ValueError(f"Could not identify Ji species/mass columns in {path}. Columns found: {list(df.columns)}")
     out = pd.DataFrame()
     out["species_normalized"] = df[species_col].map(normalize_species_name)
-    out["mass_grams_ji"] = pd.to_numeric(df[mass_col], errors="coerce")
-    out = out.dropna(subset=["species_normalized", "mass_grams_ji"])
+    out["mass_ji"] = pd.to_numeric(df[mass_col], errors="coerce")
+    out = out.dropna(subset=["species_normalized", "mass_ji"])
     out = out[out["species_normalized"] != "unknown_species"]
     return out.drop_duplicates(subset=["species_normalized"], keep="first")
 
 
-def build_species_mass_tsv(
-    project_species: pd.DataFrame,
-    traits_oskyrko_path: Optional[Path],
-    title_traits_path: Optional[Path],
-    mass_ji_path: Optional[Path],
-) -> pd.DataFrame:
+def build_species_mass_tsv(project_species: pd.DataFrame, mass_meiri_path: Optional[Path],
+                           mass_title_path: Optional[Path], mass_ji_path: Optional[Path]) -> pd.DataFrame:
     out = project_species[["species_normalized"]].copy()
 
-    if traits_oskyrko_path:
-        out = out.merge(standardize_oskyrko_traits(traits_oskyrko_path), on="species_normalized", how="left")
-    else:
-        for col in OSKYRKO_COLUMNS:
-            out[col] = pd.NA
+    out = out.merge(standardize_meiri_mass(mass_meiri_path), on="species_normalized", how="left") if mass_meiri_path else out.assign(mass_meiri=pd.NA)
+    out = out.merge(standardize_ji_mass(mass_ji_path), on="species_normalized", how="left") if mass_ji_path else out.assign(mass_ji=pd.NA)
+    out = out.merge(standardize_title_mass(mass_title_path), on="species_normalized", how="left") if mass_title_path else out.assign(mass_title=pd.NA)
 
-    if title_traits_path:
-        out = out.merge(standardize_title_traits(title_traits_path), on="species_normalized", how="left")
-    else:
-        for col in TITLE_COLUMNS:
-            out[col] = pd.NA
-
-    if mass_ji_path:
-        out = out.merge(standardize_ji_mass(mass_ji_path), on="species_normalized", how="left")
-    else:
-        out["mass_grams_ji"] = pd.NA
-
-    out["mass_preferred"] = (
-        out["mass_grams_oskyrko"]
-        .combine_first(out["mass_grams_title"])
-        .combine_first(out["mass_grams_ji"])
-    )
+    out["mass_preferred"] = out["mass_meiri"].combine_first(out["mass_ji"]).combine_first(out["mass_title"])
 
     def source(row: pd.Series) -> str:
-        if pd.notna(row["mass_grams_oskyrko"]):
-            return "oskyrko"
-        if pd.notna(row["mass_grams_title"]):
-            return "title"
-        if pd.notna(row["mass_grams_ji"]):
+        if pd.notna(row["mass_meiri"]):
+            return "meiri"
+        if pd.notna(row["mass_ji"]):
             return "ji"
+        if pd.notna(row["mass_title"]):
+            return "title"
         return ""
 
     out["mass_source_preferred"] = out.apply(source, axis=1)
-    out["annual_number_of_eggs"] = out["mean_number_of_eggs_per_clutch"] * out["number_clutches_per_year"]
-
     out = add_genus_species_alias(out)
-    return out[
-        [
-            "species_normalized",
-            "genus_species",
-            "mass_grams_oskyrko",
-            "mass_grams_title",
-            "mass_grams_ji",
-            "mass_preferred",
-            "mass_source_preferred",
-            "max_female_length_svl_mm_oskyrko",
-            "svl_mm_title",
-            "largest_clutch_size",
-            "mean_number_of_eggs_per_clutch",
-            "number_clutches_per_year",
-            "annual_number_of_eggs",
-            "max_longevity_years",
-            "range_size",
-        ]
-    ]
+    return out[["species_normalized", "genus_species", "mass_meiri", "mass_ji", "mass_title", "mass_preferred", "mass_source_preferred"]]
 
 
 def metric_is_critical_thermal_limit(value: object, desired: str) -> bool:
@@ -518,8 +437,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("genomes_dir", type=Path, help="Path to the top-level genomes directory.")
     parser.add_argument("--manifest", type=Path, default=None, help="Project manifest CSV/TSV. Supersedes Compleasm metadata.")
     parser.add_argument("--genome-size", type=Path, default=None, help="C-value summary CSV/TSV with mean_c_value_pg.")
-    parser.add_argument("--traits-oskyrko", type=Path, default=None, help="Oskyrko et al. 2024 ReptTraits CSV/TSV.")
-    parser.add_argument("--mass-title", type=Path, default=None, help="Title et al. macroevolutionary dataset CSV/TSV, e.g. title_et_al_data.csv.")
+    parser.add_argument("--mass-meiri", type=Path, default=None, help="Meiri-style mass CSV/TSV.")
+    parser.add_argument("--mass-title", type=Path, default=None, help="Title-style mass CSV/TSV.")
     parser.add_argument("--mass-ji", type=Path, default=None, help="Ji et al. mass TSV with species and mass columns.")
     parser.add_argument("--thermal-bennett", type=Path, default=None, help="Bennett/GlobTherm-style thermal limits CSV/TSV.")
     parser.add_argument("--outdir", type=Path, default=None, help="Output directory. Default: <genomes_dir>/records/gc_metrics_inputs")
@@ -553,15 +472,15 @@ def main() -> None:
     print(f"[OK] Loaded {len(project_species)} focal species from {project_source_path} ({project_source_label})")
 
     genome_size_path = args.genome_size.expanduser().resolve() if args.genome_size else find_default_genome_size_file(nh_dir)
-    traits_oskyrko_path = args.traits_oskyrko.expanduser().resolve() if args.traits_oskyrko else find_default_file(nh_dir, ["oskyrko"])
-    title_traits_path = args.mass_title.expanduser().resolve() if args.mass_title else find_default_file(nh_dir, ["title"])
+    mass_meiri_path = args.mass_meiri.expanduser().resolve() if args.mass_meiri else find_default_file(nh_dir, ["meiri"])
+    mass_title_path = args.mass_title.expanduser().resolve() if args.mass_title else find_default_file(nh_dir, ["title"])
     mass_ji_path = args.mass_ji.expanduser().resolve() if args.mass_ji else find_default_file(nh_dir, ["ji"])
     thermal_bennett_path = args.thermal_bennett.expanduser().resolve() if args.thermal_bennett else find_default_file(nh_dir, ["bennett"])
 
     if genome_size_path is None and not args.allow_missing_natural_history:
         raise FileNotFoundError("No genome-size/C-value summary file was provided or auto-detected.")
-    if traits_oskyrko_path is None and title_traits_path is None and mass_ji_path is None and not args.allow_missing_natural_history:
-        raise FileNotFoundError("No Oskyrko/ReptTraits, Title, or Ji trait/mass file was provided or auto-detected.")
+    if mass_meiri_path is None and mass_title_path is None and mass_ji_path is None and not args.allow_missing_natural_history:
+        raise FileNotFoundError("No Meiri, Title, or Ji mass file was provided or auto-detected.")
     if thermal_bennett_path is None and not args.allow_missing_natural_history:
         raise FileNotFoundError("No Bennett/GlobTherm thermal file was provided or auto-detected.")
 
@@ -580,22 +499,16 @@ def main() -> None:
     write_tsv(genome_size_df, genome_size_out)
     print(f"[OK] Wrote {genome_size_out} ({int(genome_size_df['genome_size'].notna().sum())}/{len(genome_size_df)} species matched)")
 
-    mass_df = build_species_mass_tsv(project_species, traits_oskyrko_path, title_traits_path, mass_ji_path)
+    mass_df = build_species_mass_tsv(project_species, mass_meiri_path, mass_title_path, mass_ji_path)
     mass_out = outdir / "species_mass.tsv"
     write_tsv(mass_df, mass_out)
     print(
         f"[OK] Wrote {mass_out} "
-        f"(oskyrko_mass={int(mass_df['mass_grams_oskyrko'].notna().sum())}, "
-        f"title_mass={int(mass_df['mass_grams_title'].notna().sum())}, "
-        f"ji_mass={int(mass_df['mass_grams_ji'].notna().sum())}, "
+        f"(meiri={int(mass_df['mass_meiri'].notna().sum())}, "
+        f"ji={int(mass_df['mass_ji'].notna().sum())}, "
+        f"title={int(mass_df['mass_title'].notna().sum())}, "
         f"preferred={int(mass_df['mass_preferred'].notna().sum())}/{len(mass_df)}; "
-        "preferred priority=oskyrko>title>ji)"
-    )
-    print(
-        f"[INFO] Trait matches: svl_oskyrko={int(mass_df['max_female_length_svl_mm_oskyrko'].notna().sum())}, "
-        f"svl_title={int(mass_df['svl_mm_title'].notna().sum())}, "
-        f"annual_eggs={int(mass_df['annual_number_of_eggs'].notna().sum())}, "
-        f"range_size={int(mass_df['range_size'].notna().sum())}"
+        "preferred priority=meiri>ji>title)"
     )
 
     thermal_df = build_thermal_limits_tsv(project_species, thermal_bennett_path)
