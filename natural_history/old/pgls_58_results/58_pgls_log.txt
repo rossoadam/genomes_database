@@ -1,0 +1,129 @@
+58-species PGLS workflow
+========================
+
+Data: /Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o26_with_s_punctatus/08_final_outputs/gc_metrics_outputs_wtih_thermal/master_output.tsv 
+Tree: /Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o7_with_s_punctatus/05_unrooted_tree_t1.0_e1_o7_with_s_punctatus/rev_dna.treefile 
+Output directory: pgls_58_results 
+Manifest: /Users/rossoaa/projects/genomes/records/project_manifests/mass_predicts_dna_dynamics_with_s_punctatus_manifest.csv 
+
+Manifest accession mappings loaded: 84 
+Original data rows: 58 
+Original tree tips: 77 
+
+Species shared by tree and data: 58 
+Species only in tree: 19 
+Species only in data: 0 
+
+                     variable n_missing n_present
+mean_gc3             mean_gc3         0        58
+genome_size       genome_size        46        12
+mass_preferred mass_preferred         0        58
+ctmax                   ctmax        47        11
+ctmin                   ctmin        52         6
+
+Complete rows for full requested additive model: 3 
+
+Pairwise predictor correlations:
+               genome_size mass_preferred     ctmax      ctmin
+genome_size      1.0000000      0.3267937 0.4020418 -0.2330829
+mass_preferred   0.3267937      1.0000000 0.1707288 -0.4687563
+ctmax            0.4020418      0.1707288 1.0000000  0.2916943
+ctmin           -0.2330829     -0.4687563 0.2916943  1.0000000
+null device 
+          1 
+
+Model: pgls_mass 
+Formula: mean_gc3 ~ mass_preferred 
+Complete rows: 58 
+Predictors: 1 
+Suggested minimum rows: 3 
+
+Model: pgls_genome_size 
+Formula: mean_gc3 ~ genome_size 
+Complete rows: 12 
+Predictors: 1 
+Suggested minimum rows: 3 
+
+Model: pgls_ctmax 
+Formula: mean_gc3 ~ ctmax 
+Complete rows: 11 
+Predictors: 1 
+Suggested minimum rows: 3 
+
+Model: pgls_ctmin 
+Formula: mean_gc3 ~ ctmin 
+Complete rows: 6 
+Predictors: 1 
+Suggested minimum rows: 3 
+
+Model: pgls_full_additive 
+Formula: mean_gc3 ~ genome_size + ctmax + mass_preferred + ctmin 
+Complete rows: 3 
+Predictors: 4 
+Suggested minimum rows: 12 
+SKIPPED: pgls_full_additive has too few complete rows for reliable PGLS.
+
+Candidate additive model comparison on full-complete dataset
+----------------------------------------------------------
+SKIPPED candidate model comparison: only 3 species are complete for all predictors.
+                              model
+intercept_only       intercept_only
+mass                           mass
+genome_size             genome_size
+ctmax                         ctmax
+ctmin                         ctmin
+mass_genome_size   mass_genome_size
+mass_ctmax               mass_ctmax
+mass_ctmin               mass_ctmin
+genome_size_ctmax genome_size_ctmax
+genome_size_ctmin genome_size_ctmin
+ctmax_ctmin             ctmax_ctmin
+full_additive         full_additive
+                                                                  formula n
+intercept_only                                               mean_gc3 ~ 1 3
+mass                                            mean_gc3 ~ mass_preferred 3
+genome_size                                        mean_gc3 ~ genome_size 3
+ctmax                                                    mean_gc3 ~ ctmax 3
+ctmin                                                    mean_gc3 ~ ctmin 3
+mass_genome_size                  mean_gc3 ~ mass_preferred + genome_size 3
+mass_ctmax                              mean_gc3 ~ mass_preferred + ctmax 3
+mass_ctmin                              mean_gc3 ~ mass_preferred + ctmin 3
+genome_size_ctmax                          mean_gc3 ~ genome_size + ctmax 3
+genome_size_ctmin                          mean_gc3 ~ genome_size + ctmin 3
+ctmax_ctmin                                      mean_gc3 ~ ctmax + ctmin 3
+full_additive     mean_gc3 ~ genome_size + ctmax + mass_preferred + ctmin 3
+                  predictors AIC AICc delta_AICc weight_AICc
+intercept_only             0  NA   NA         NA          NA
+mass                       1  NA   NA         NA          NA
+genome_size                1  NA   NA         NA          NA
+ctmax                      1  NA   NA         NA          NA
+ctmin                      1  NA   NA         NA          NA
+mass_genome_size           2  NA   NA         NA          NA
+mass_ctmax                 2  NA   NA         NA          NA
+mass_ctmin                 2  NA   NA         NA          NA
+genome_size_ctmax          2  NA   NA         NA          NA
+genome_size_ctmin          2  NA   NA         NA          NA
+ctmax_ctmin                2  NA   NA         NA          NA
+full_additive              4  NA   NA         NA          NA
+                                                                  note
+intercept_only    skipped_too_few_complete_rows_for_full_predictor_set
+mass              skipped_too_few_complete_rows_for_full_predictor_set
+genome_size       skipped_too_few_complete_rows_for_full_predictor_set
+ctmax             skipped_too_few_complete_rows_for_full_predictor_set
+ctmin             skipped_too_few_complete_rows_for_full_predictor_set
+mass_genome_size  skipped_too_few_complete_rows_for_full_predictor_set
+mass_ctmax        skipped_too_few_complete_rows_for_full_predictor_set
+mass_ctmin        skipped_too_few_complete_rows_for_full_predictor_set
+genome_size_ctmax skipped_too_few_complete_rows_for_full_predictor_set
+genome_size_ctmin skipped_too_few_complete_rows_for_full_predictor_set
+ctmax_ctmin       skipped_too_few_complete_rows_for_full_predictor_set
+full_additive     skipped_too_few_complete_rows_for_full_predictor_set
+
+Model: pgls_full_additive_log10_mass_sensitivity 
+Formula: mean_gc3 ~ genome_size + ctmax + log10_mass_preferred + ctmin 
+Complete rows: 3 
+Predictors: 4 
+Suggested minimum rows: 12 
+SKIPPED: pgls_full_additive_log10_mass_sensitivity has too few complete rows for reliable PGLS.
+
+Done. Results written to: pgls_58_results 

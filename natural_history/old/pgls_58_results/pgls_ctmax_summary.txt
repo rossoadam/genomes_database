@@ -1,0 +1,35 @@
+Generalized least squares fit by maximum likelihood
+  Model: formula_obj 
+  Data: complete_data 
+       AIC      BIC    logLik
+  41.19074 42.38443 -17.59537
+
+Correlation Structure: corBrownian
+ Formula: ~genus_species 
+ Parameter estimate(s):
+numeric(0)
+
+Coefficients:
+               Value Std.Error   t-value p-value
+(Intercept) 52.42853 10.806230  4.851695  0.0009
+ctmax       -0.09054  0.253997 -0.356476  0.7297
+
+ Correlation: 
+      (Intr)
+ctmax -0.997
+
+Standardized residuals:
+        Min          Q1         Med          Q3         Max 
+-2.08180080  0.06532884  0.25232993  1.45624725  1.66379559 
+
+Residual standard error: 1.697108 
+Degrees of freedom: 11 total; 9 residual
+
+ANOVA table:
+Denom. DF: 9 
+            numDF  F-value p-value
+(Intercept)     1 3178.782  <.0001
+ctmax           1    0.127  0.7297
+
+AIC: 41.19074 
+AICc: 44.61931 
