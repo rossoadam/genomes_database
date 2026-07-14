@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 
 """
-python3 10_rename_aligned_fasta.py \
+python3 09_rename_aligned_fasta.py \
   /Users/rossoaa/projects/genomes \
   --fastadir /Users/rossoaa/projects/genomes/records/compleasm/alignments/04_concatenated_clean_alignments_t100_e1_o7
 """
@@ -22,12 +22,18 @@ class RenameAlignedFastas:
         self.fasta_list = []
 
     def load_metadata(self):
-        """Load accession -> genus_species mapping from metadata.csv"""
+        """Load accession -> Genus_species mapping from metadata.csv"""
         with open(self.metadata_csv, "r", newline="") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 accession = row["accession"].strip()
                 organism_name = row["genus_species"].strip()
+    
+                # Capitalize genus only
+                if "_" in organism_name:
+                    genus, species = organism_name.split("_", 1)
+                    organism_name = f"{genus.capitalize()}_{species}"
+    
                 self.accession_to_organism[accession] = organism_name
 
     def load_fasta_list(self):
