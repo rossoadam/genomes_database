@@ -239,8 +239,8 @@ run_one() {
   fi
 
   # CDS extraction
-  echo "[CDS ] python3 $(basename "$GET_CDS_PY") <genome> <full_table> <genus_species>" >&2
-  python3 "$GET_CDS_PY" "$genome" "$full_table" "$genus_species"
+  echo "[CDS ] python $(basename "$GET_CDS_PY") <genome> <full_table> <genus_species>" >&2
+  python "$GET_CDS_PY" "$genome" "$full_table" "$genus_species"
 
   if [[ ! -s "$cds_fasta" ]]; then
     echo "ERROR: CDS FASTA missing/empty: $cds_fasta" >&2

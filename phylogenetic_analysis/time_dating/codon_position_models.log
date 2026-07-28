@@ -1,0 +1,176 @@
+IQ-TREE version 3.0.1 for MacOS ARM 64-bit built Jun 30 2025
+Developed by Bui Quang Minh, Thomas Wong, Nhan Ly-Trong, Huaiyan Ren
+Contributed by Lam-Tung Nguyen, Dominik Schrempf, Chris Bielow,
+Olga Chernomor, Michael Woodhams, Diep Thi Hoang, Heiko Schmidt
+
+Host:    BIOL-135085 (SSE4.2, 64 GB RAM)
+Command: /opt/homebrew/bin/iqtree3 -s /Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o0_with_s_punctatus/16_time_dating/04_concatenated_renamed/concatenated.phy -Q /Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o0_with_s_punctatus/16_time_dating/04_concatenated_renamed/concatenated.phy.partitions.codon_positions.partitions -m MFP -te /Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o0_with_s_punctatus/07_renamed_treefile_nhpyml_input/rev_dna_renamed_keep_lengths.rooted_renamed_topology_only.nwk -T AUTO --prefix codon_position_models
+Seed:    353105 (Using SPRNG - Scalable Parallel Random Number Generator)
+Time:    Wed Jul 15 12:35:35 2026
+Kernel:  SSE2 - auto-detect threads (10 CPU cores detected)
+
+Reading partition model file /Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o0_with_s_punctatus/16_time_dating/04_concatenated_renamed/concatenated.phy.partitions.codon_positions.partitions ...
+Reading alignment file /Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o0_with_s_punctatus/16_time_dating/04_concatenated_renamed/concatenated.phy ... Phylip format detected
+Alignment most likely contains DNA/RNA sequences
+Constructing alignment: done in 0.372168 secs using 71.89% CPU
+WARNING: 9 sites contain only gaps or ambiguous characters.
+Alignment has 84 sequences with 410289 columns, 155747 distinct patterns
+164220 parsimony-informative, 37805 singleton sites, 208264 constant sites
+                            Gap/Ambiguity  Composition  p-value
+Analyzing sequences: done in 0.0226929 secs using 693% CPU
+   1  Eublepharis_macularius        8.86%    failed      0.00%
+   2  Aspidoscelis_marmoratus       8.98%    passed     76.84%
+   3  Aspidoscelis_tigris           8.86%    passed     69.99%
+   4  Aspidoscelis_inornatus        8.74%    passed     34.69%
+   5  Phrynocephalus_guinanensis    9.25%    failed      0.00%
+   6  Laudakia_wui                  9.20%    failed      0.00%
+   7  Pogona_vitticeps              9.16%    passed      6.91%
+   8  Furcifer_pardalis             9.23%    failed      1.07%
+   9  Chamaeleo_calyptratus         9.24%    failed      0.00%
+  10  Naja_naja                     8.64%    failed      0.00%
+  11  Candoia_aspera                8.91%    failed      0.00%
+  12  Podarcis_bocagei              8.82%    failed      0.00%
+  13  Varanus_acanthurus            9.15%    failed      0.00%
+  14  Xantusia_vigilis              8.80%    failed      0.07%
+  15  Cryptoblepharus_egeriae       8.69%    passed     75.74%
+  16  Crotalus_viridis              9.00%    failed      0.00%
+  17  Crotalus_adamanteus           8.87%    failed      0.00%
+  18  Sistrurus_catenatus           8.72%    failed      0.00%
+  19  Bothrops_insularis            8.64%    failed      0.00%
+  20  Vipera_latastei               8.89%    failed      0.00%
+  21  Vipera_berus                  8.89%    failed      0.00%
+  22  Vipera_ammodytes              8.67%    failed      0.00%
+  23  Vipera_ursinii                8.87%    failed      0.00%
+  24  Macrovipera_schweizeri        8.82%    failed      0.00%
+  25  Cerastes_gasperettii          8.62%    failed      0.00%
+  26  Hydrophis_cyanocinctus        9.06%    failed      0.00%
+  27  Hydrophis_major               8.97%    failed      0.00%
+  28  Bungarus_multicinctus         9.03%    failed      0.00%
+  29  Hemorrhois_hippocrepis        9.12%    failed      0.00%
+  30  Rhabdophis_nuchalis           8.76%    failed      0.00%
+  31  Ahaetulla_prasina             8.99%    failed      0.00%
+  32  Elaphe_schrenckii             9.24%    failed      0.00%
+  33  Coluber_constrictor           9.17%    failed      0.00%
+  34  Pseudoxenodon_stejnegeri      8.85%    failed      0.00%
+  35  Malpolon_monspessulanus       9.19%    failed      0.00%
+  36  Natrix_helvetica              9.02%    failed      0.00%
+  37  Natrix_maura                  9.08%    failed      0.00%
+  38  Thamnophis_elegans            9.17%    failed      0.00%
+  39  Erythrolamprus_reginae        8.89%    failed      0.00%
+  40  Euleptes_europaea             8.69%    failed      0.00%
+  41  Teratoscincus_roborowskii     9.07%    failed      0.00%
+  42  Asaccus_caudivolvulus         8.97%    failed      0.00%
+  43  Paroedura_picta               9.28%    failed      0.00%
+  44  Gekko_kuhli                   8.76%    failed      0.00%
+  45  Sphaerodactylus_townsendi     9.15%    failed      0.00%
+  46  Heteronotia_binoei            8.82%    failed      0.00%
+  47  Mediodactylus_kotschyi        8.81%    failed      0.00%
+  48  Cyrtopodion_scabrum           8.93%    failed      0.00%
+  49  Sphenodon_punctatus           8.68%    failed      0.00%
+  50  Liasis_olivaceus              8.96%    failed      0.00%
+  51  Sceloporus_tristichus         8.71%    failed      0.07%
+  52  Sceloporus_undulatus          8.81%    failed      0.02%
+  53  Phrynosoma_platyrhinos        8.72%    failed      0.00%
+  54  Uta_stansburiana              8.63%    failed      0.91%
+  55  Cyclura_pinguis               8.59%    passed     20.25%
+  56  Iguana_iguana                 8.62%    failed      3.72%
+  57  Anolis_carolinensis           9.01%    failed      0.69%
+  58  Anolis_sagrei                 9.03%    failed      0.01%
+  59  Shinisaurus_crocodilurus      8.42%    failed      0.00%
+  60  Anniella_stebbinsi            9.14%    failed      0.00%
+  61  Elgaria_multicarinata         8.80%    failed      0.00%
+  62  Dopasia_gracilis              8.66%    failed      0.00%
+  63  Lacerta_agilis                8.77%    failed      0.00%
+  64  Podarcis_cretensis            8.76%    failed      0.00%
+  65  Podarcis_gaigeae              8.74%    failed      0.00%
+  66  Podarcis_siculus              9.03%    failed      0.00%
+  67  Podarcis_melisellensis        8.80%    failed      0.00%
+  68  Podarcis_erhardii             8.79%    failed      0.00%
+  69  Podarcis_liolepis             8.59%    failed      0.00%
+  70  Podarcis_vaucheri             8.60%    failed      0.00%
+  71  Podarcis_muralis              8.75%    failed      0.00%
+  72  Podarcis_filfolensis          8.85%    failed      0.00%
+  73  Podarcis_raffonei             8.88%    failed      0.00%
+  74  Podarcis_tiliguerta           8.86%    failed      0.00%
+  75  Podarcis_lilfordi             8.77%    failed      0.00%
+  76  Podarcis_pityusensis          8.75%    failed      0.00%
+  77  Zootoca_vivipara              8.82%    failed      0.00%
+  78  Rhineura_floridana            8.65%    passed     41.35%
+  79  Hemicordylus_capensis         8.78%    failed      0.00%
+  80  Acritoscincus_duperreyi       9.11%    passed     93.82%
+  81  Carinascincus_ocellatus       8.48%    passed     12.64%
+  82  Tiliqua_scincoides            9.10%    failed      0.00%
+  83  Spondylurus_nitidus           8.46%    passed     30.79%
+  84  Cryptoblepharus_pulcher       8.56%    passed     54.56%
+****  TOTAL                         8.87%  73 sequences failed composition chi2 test (p-value<5%; df=3)
+
+Partition file is not in NEXUS format, assuming RAxML-style partition file...
+Subset	Type	Seqs	Sites	Infor	Invar	Model	Name
+1	DNA	84	136763	36009	86758	GTR	codon_pos1
+2	DNA	84	136763	23694	100898	GTR	codon_pos2
+3	DNA	84	136763	104517	20608	GTR	codon_pos3
+Degree of missing data: 0.000
+
+
+Reading input tree file /Users/rossoaa/projects/genomes/records/compleasm/alignments/t1.0_e1_o0_with_s_punctatus/07_renamed_treefile_nhpyml_input/rev_dna_renamed_keep_lengths.rooted_renamed_topology_only.nwk ... rooted tree
+Measuring multi-threading efficiency up to 10 CPU cores
+3 trees examined
+Threads: 1 / Time: 13.354 sec / Speedup: 1.000 / Efficiency: 100% / LogL: -9703272
+Threads: 2 / Time: 8.826 sec / Speedup: 1.513 / Efficiency: 76% / LogL: -9703272
+Threads: 3 / Time: 8.698 sec / Speedup: 1.535 / Efficiency: 51% / LogL: -9703272
+Threads: 4 / Time: 4.180 sec / Speedup: 3.195 / Efficiency: 80% / LogL: -9703272
+Threads: 5 / Time: 3.696 sec / Speedup: 3.613 / Efficiency: 72% / LogL: -9703272
+Threads: 6 / Time: 3.595 sec / Speedup: 3.715 / Efficiency: 62% / LogL: -9703272
+Threads: 7 / Time: 2.973 sec / Speedup: 4.492 / Efficiency: 64% / LogL: -9703272
+Threads: 8 / Time: 3.122 sec / Speedup: 4.278 / Efficiency: 53% / LogL: -9703272
+Threads: 9 / Time: 2.680 sec / Speedup: 4.982 / Efficiency: 55% / LogL: -9703272
+Threads: 10 / Time: 2.851 sec / Speedup: 4.684 / Efficiency: 47% / LogL: -9703272
+Determining AUTO threadcount: done in 53.9764 secs using 236.8% CPU
+BEST NUMBER OF THREADS: 9
+
+Perform fast likelihood tree search using GTR+I+G model...
+Estimate model parameters (epsilon = 5.000)
+Time for fast ML tree search: 54.397 seconds
+
+NOTE: ModelFinder requires 4493 MB RAM!
+Selecting individual models for 3 charsets using BIC...
+ No. Model        Score       TreeLen     Charset
+In ModelFinder: parallelization over partitions
+   1 GTR+F+I+R4   1538394.647 0.893       codon_pos2
+   2 GTR+F+R5     2103823.899 1.401       codon_pos1
++I+R5 reinitialized from +I+R4 with factor 0.500
+   3 TVM+F+I+R4   5627245.857 5.389       codon_pos3
+Full partition model BIC score: 9270057.653 (LnL: -4631539.180  df:540)
+Partition information was printed to codon_position_models.best_scheme.nex
+Partition information in Raxml format was printed to codon_position_models.best_scheme
+
+All model information printed to codon_position_models.model.gz
+CPU time for ModelFinder: 36026.108 seconds (10h:0m:26s)
+Wall-clock time for ModelFinder: 25636.821 seconds (7h:7m:16s)
+
+NOTE: 1897 MB RAM (1 GB) is required!
+Estimate model parameters (epsilon = 0.010)
+Partition codon_pos3 / Model: TVM+F+I+R4 / df: 179 / LogL: -2812565.700
+Partition codon_pos1 / Model: GTR+F+R5 / df: 181 / LogL: -1050840.620
+Partition codon_pos2 / Model: GTR+F+I+R4 / df: 180 / LogL: -768133.179
+Optimal log-likelihood: -4631539.499
+Wrote distance file to... 
+Partition information was printed to codon_position_models.best_model.nex
+BEST SCORE FOUND : -4631539.499
+Total tree length: 2.562
+
+Total number of iterations: 0
+CPU time used for tree search: 0.000 sec (0h:0m:0s)
+Wall-clock time used for tree search: 0.000 sec (0h:0m:0s)
+Total CPU time used: 39082.976 sec (10h:51m:22s)
+Total wall-clock time used: 26114.088 sec (7h:15m:14s)
+
+Analysis results written to: 
+  IQ-TREE report:                codon_position_models.iqtree
+  Maximum-likelihood tree:       codon_position_models.treefile
+  Partition trees:               codon_position_models.parttrees
+  Best partitioning scheme:      codon_position_models.best_scheme.nex
+           in RAxML format:      codon_position_models.best_scheme
+  Screen log file:               codon_position_models.log
+
+Date and Time: Wed Jul 15 19:50:51 2026
