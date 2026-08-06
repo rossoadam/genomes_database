@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
-# root_for_nhphyml.R
-# Usage: Rscript root_for_nhphyml.R <genomes_dir> <outgroup_list> <newick_file>
+# 08a_root_a_tree.R
+# Usage: Rscript root_a_tree.R <genomes_dir> <outgroup_list> <newick_file>
 
 suppressPackageStartupMessages({
   library(phytools)
@@ -199,4 +199,69 @@ plot_tree_pdf(
                       length(display_tree$tip.label), length(matched_outgroup))
 )
 
-cat("\nDone. Feed the .rooted.nwk to nhphyml with -u flag.\n")
+
+# ── 10. Write NHPhyML-formatted topology-only tree ───────────────────────────
+
+format_nhphyml_tip <- function(label) {
+  # Normalize whitespace to underscores, then retain only Genus_species.
+  normalized <- gsub("\\s+", "_", trimws(label))
+  parts <- strsplit(normalized, "_", fixed = TRUE)[[1]]
+  parts <- parts[nchar(parts) > 0]
+
+  # Accessions or otherwise unmatched labels cannot be safely converted to
+  # Genus_species, so retain them unchanged and report them below.
+  if (length(parts) < 2) {
+    return(normalized)
+  }
+
+  genus   <- parts[1]
+  species <- parts[2]
+
+  # Capitalize only the first character of the genus and lowercase the rest.
+  genus <- paste0(toupper(substr(genus, 1, 1)),
+                  tolower(substr(genus, 2, nchar(genus))))
+
+  paste(genus, species, sep = "_")
+}
+
+nhphyml_tree <- display_tree
+original_labels <- nhphyml_tree$tip.label
+nhphyml_tree$tip.label <- vapply(
+  original_labels,
+  format_nhphyml_tip,
+  character(1),
+  USE.NAMES = FALSE
+)
+
+# Removing subspecies can collapse distinct tips to the same Genus_species
+# label. Stop rather than write a Newick file with ambiguous duplicate names.
+duplicate_labels <- unique(nhphyml_tree$tip.label[duplicated(nhphyml_tree$tip.label)])
+if (length(duplicate_labels) > 0) {
+  stop(sprintf(
+    paste0(
+      "NHPhyML formatting produced duplicate Genus_species tip labels: %s. ",
+      "These likely represent multiple subspecies or accessions from the same species."
+    ),
+    paste(duplicate_labels, collapse = ", ")
+  ))
+}
+
+unformatted_labels <- original_labels[!grepl("[ _]", trimws(original_labels))]
+if (length(unformatted_labels) > 0) {
+  cat("\nWARNING: The following labels could not be reduced to Genus_species ",
+      "and were retained unchanged:\n", sep = "")
+  cat(paste(" -", unformatted_labels, collapse = "\n"), "\n")
+}
+
+# ape::write.tree() omits branch lengths when edge.length is NULL.
+nhphyml_tree$edge.length <- NULL
+
+nhphyml_file <- file.path(
+  rooted_dir,
+  paste0(base_name, ".rooted_renamed_topology_only_nhphyml_format.nwk")
+)
+write.tree(nhphyml_tree, file = nhphyml_file)
+cat(sprintf("NHPhyML-formatted topology-only tree written to: %s\n",
+            nhphyml_file))
+
+cat("\nDone. Existing rooted-tree outputs were retained, and the NHPhyML-formatted topology-only tree was added.\n")
