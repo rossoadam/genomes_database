@@ -256,6 +256,10 @@ if (length(unformatted_labels) > 0) {
 # ape::write.tree() omits branch lengths when edge.length is NULL.
 nhphyml_tree$edge.length <- NULL
 
+# Remove all internal-node labels, including IQ-TREE support values
+# (for example 100, 99, 72) and any root label such as "Root".
+nhphyml_tree$node.label <- NULL
+
 nhphyml_file <- file.path(
   rooted_dir,
   paste0(base_name, ".rooted_renamed_topology_only_nhphyml_format.nwk")
