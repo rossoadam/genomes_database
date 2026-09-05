@@ -1,3 +1,247 @@
+2026SEP01 - 2026SEP04
+python 00a_natural_history_standardized_and_name_audit.py \
+/Users/rossoaa/projects/genomes \
+	--manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+	--genome-size /Users/rossoaa/projects/genomes/records/natural_history/reptile_summary/species_summary.csv \
+	--traits-oskyrko /Users/rossoaa/projects/genomes/records/natural_history/oskyrko_et_al_2024_repttraits.csv \
+	--mass-title /Users/rossoaa/projects/genomes/records/natural_history/title_at_al_data.csv \
+	--mass-ji /Users/rossoaa/projects/genomes/records/natural_history/ji_et_al.tsv \
+	--thermal-bennett /Users/rossoaa/projects/genomes/records/natural_history/bennett_et_al_2019_globaltherm_upload_10_11_17.csv
+
+python 00b_build_starter_sql_tsvs_v15.py \
+	--genomes-dir /Users/rossoaa/projects/genomes \
+	--manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+	--natural-history /Users/rossoaa/projects/genomes/records/natural_history_standardized/natural_history_standardized.tsv \
+    --species-name-audit /Users/rossoaa/projects/genomes/records/sql_tsvs/species_name_audit.tsv \
+    --output-dir /Users/rossoaa/projects/genomes/records/sql_tsvs/ \
+    --all-accessions
+
+python 00c_build_tsvs_from_gff.py \
+	../../../genomes \
+	--debug
+
+here are some of the outputs to the terminal:
+WARNING: GCA_003113815.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_003400415.2: path_to_gff is empty; accession skipped.
+WARNING: GCA_014337955.2: path_to_gff is empty; accession skipped.
+WARNING: GCA_016801065.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_019473425.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_021292165.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_023653725.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_030015325.2: path_to_gff is empty; accession skipped.
+WARNING: GCA_030412105.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_030440675.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_033807585.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_037367245.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_038048745.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_039707465.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_039880765.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_040285375.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_041380405.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_041722995.2: path_to_gff is empty; accession skipped.
+WARNING: GCA_042257475.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_043643385.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_046524025.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_047301725.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_050042745.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_050231175.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_050613815.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_051312515.2: path_to_gff is empty; accession skipped.
+WARNING: GCA_051473905.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_051529865.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_051940855.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_052054735.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_053572275.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_053574215.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_054791115.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_055504975.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_055773955.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_055824665.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_947247035.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964106635.2: path_to_gff is empty; accession skipped.
+WARNING: GCA_964106915.2: path_to_gff is empty; accession skipped.
+WARNING: GCA_964188175.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964188305.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964234825.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964252035.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964265115.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964270895.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964273705.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964340495.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_964659585.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_965112155.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_965113305.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_965153305.2: path_to_gff is empty; accession skipped.
+WARNING: GCA_965194845.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_965280105.1: path_to_gff is empty; accession skipped.
+WARNING: GCA_965636955.1: path_to_gff is empty; accession skipped.
+
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 77348 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 143920 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 187742 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 230134 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 264540 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 280136 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 301296 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 319696 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 328594 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 338212 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 357668 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 365380 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 378160 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 388230 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 466018 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 533122 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 576312 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 619276 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 657802 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 673160 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 695386 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 713540 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 725508 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 735604 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 755880 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 761112 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 774534 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 785630 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 862900 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 930386 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 972576 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1015430 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1051130 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1071062 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1089304 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1097984 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1107560 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1127298 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1132328 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff: line 1142912 has fewer than 9 GFF fields; skipping.
+
+After inspecting looks like these lines are blank:
+
+GFF="/Users/rossoaa/projects/genomes/GWHFILM00000000.1/GWHFILM00000000.1_genomic.gff"
+
+awk -F '\t' '
+!/^#/ && NF < 9 {
+    if ($0 == "")
+        print NR, "BLANK"
+    else
+        print NR, "NON-BLANK:", $0
+}' "$GFF"
+77348 BLANK
+143920 BLANK
+187742 BLANK
+230134 BLANK
+264540 BLANK
+280136 BLANK
+301296 BLANK
+319696 BLANK
+328594 BLANK
+338212 BLANK
+357668 BLANK
+365380 BLANK
+378160 BLANK
+388230 BLANK
+466018 BLANK
+533122 BLANK
+576312 BLANK
+619276 BLANK
+657802 BLANK
+673160 BLANK
+695386 BLANK
+713540 BLANK
+725508 BLANK
+735604 BLANK
+755880 BLANK
+761112 BLANK
+774534 BLANK
+785630 BLANK
+862900 BLANK
+930386 BLANK
+972576 BLANK
+1015430 BLANK
+1051130 BLANK
+1071062 BLANK
+1089304 BLANK
+1097984 BLANK
+1107560 BLANK
+1127298 BLANK
+1132328 BLANK
+1142912 BLANK
+
+Here is my validation test for the igs:
+
+(base) rossoaa@BIOL-135085 synthetic_genome_v1 % ls -o
+total 48
+-rw-r--r--  1 rossoaa  1162 Sep  4 11:58 readme.txt
+-rw-r--r--  1 rossoaa   199 Sep  4 11:58 test_genomes_metadata.csv
+-rw-r--r--  1 rossoaa    26 Sep  4 11:58 test_manifest.csv
+-rw-r--r--  2 rossoaa   108 Sep  4 11:58 test_sequences.tsv
+-rw-r--r--  1 rossoaa   112 Sep  4 11:40 TEST000000001.1_genomic.fna
+-rw-r--r--  1 rossoaa  1253 Sep  4 11:42 TEST000000001.1_genomic.gff
+(base) rossoaa@BIOL-135085 synthetic_genome_v1 % python 00c_build_tsvs_from_gff.py \
+    /Users/rossoaa/projects/genomes \
+    --manifest /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/test_manifest.csv \
+    --metadata /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/test_genomes_metadata.csv \
+    --sequences /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/test_sequences.tsv \
+    --output /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/test_igs.tsv \
+    --debug
+python: can't open file '/Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/00c_build_tsvs_from_gff.py': [Errno 2] No such file or directory
+(base) rossoaa@BIOL-135085 synthetic_genome_v1 % head test.igs.tsv
+head: test.igs.tsv: No such file or directory
+(base) rossoaa@BIOL-135085 synthetic_genome_v1 % head test_igs.tsv
+igs_pk	sequence_pk	igs_seq_start	igs_seq_end	length	gc
+1	9999991	10	19	10	1.0
+2	9999991	38	47	10	0.0
+3	9999991	66	75	10	0.4
+
+these values match what we expect
+
+I edited the 00c script so that the debug function is removed since it seems to work fine:
+
+(liftoff_2) rossoaa@BIOL-135085 sql % python 00c_build_tsvs_from_gff.py \
+    /Users/rossoaa/projects/genomes \
+    --manifest /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/test_manifest.csv \
+    --metadata /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/test_genomes_metadata.csv \
+    --sequences /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/test_sequences.tsv \
+    --output /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/test_igs.tsv
+WARNING: /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/TEST000000001.1_genomic.gff: line 7 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/TEST000000001.1_genomic.gff: line 12 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/TEST000000001.1_genomic.gff: line 17 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/TEST000000001.1_genomic.gff: line 22 has fewer than 9 GFF fields; skipping.
+WARNING: /Users/rossoaa/projects/genomes/records/test_data/synthetic_genome_v1/TEST000000001.1_genomic.gff: line 27 has fewer than 9 GFF fields; skipping.
+
+Next I need to update the 01_load_starter_sql_tsvs_v3.py script so that it uploads the igs.tsv table as well as the others.
+
+But before doing that I need to confirm which gffs are missing from my local genome repository
+in /genomes/ the following accessions are missing gffs:
+	GCA_021292165.1
+
+(ncbi_datasets) rossoaa@BIOL-135085 genomes_database % python genomes_file_recovery_v1.py ../../genomes GCA_021292165.1 --source ncbi 
+
+I am going to try the refactored genomes_file_recovery_v1.py using only the GCA_021292165.1
+- that looked like it worked.
+
+Now I am doing:
+
+
+(ncbi_datasets) rossoaa@BIOL-135085 genomes_database % python genomes_file_recovery_v1.py ../../genomes squamata --source ncbi
+
+2026AUG31
+
+python 00a_make_natural_history_standardized.py \
+/Users/rossoaa/projects/genomes \
+	--manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+	--genome-size /Users/rossoaa/projects/genomes/records/natural_history/reptile_summary/species_summary.csv \
+	--traits-oskyrko /Users/rossoaa/projects/genomes/records/natural_history/oskyrko_et_al_2024_repttraits.csv \
+	--mass-title /Users/rossoaa/projects/genomes/records/natural_history/title_at_al_data.csv \
+	--mass-ji /Users/rossoaa/projects/genomes/records/natural_history/ji_et_al.tsv \
+	--thermal-bennett /Users/rossoaa/projects/genomes/records/natural_history/bennett_et_al_2019_globaltherm_upload_10_11_17.csv \
+
+
+
+everything below this is prior to 2026AUG31
+
   python 00_build_starter_sql_tsvs.py \
     --genomes-dir /Users/rossoaa/projects/genomes \
     --manifest /Users/rossoaa/projects/genomes/records/project_manifests/mass_predicts_dna_dynamics_with_s_punctatus_manifest.csv \

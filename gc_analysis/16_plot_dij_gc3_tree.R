@@ -611,7 +611,7 @@ plot_tree_pdf <- function(tree, edge_keys, pdf_path, gc3_values, gradient_steps 
     if (!is.na(ancestral_gc_display)) {
       text(
         -5.75,
-        0.8,
+        0.98,
         labels = sprintf("Ancestral GC3 = %.2f", ancestral_gc_display),
         adj = 0,
         cex = 1.5,
