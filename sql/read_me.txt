@@ -669,9 +669,8 @@ python 05_to_sql_compleasm_features_v5.py \
   
 conda deactivate
 conda activate bio
-python 06_nhpyhml_to_tsvs_v4.py \
---sql-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs \
---output-dir
+python 06_nhphyml_to_tsvs_v4.py \
+--sql-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs
 
   -h, --help            show this help message and exit
   --sql-tsv-dir SQL_TSV_DIR
@@ -681,8 +680,12 @@ python 06_nhpyhml_to_tsvs_v4.py \
   --summary-alignments-root SUMMARY_ALIGNMENTS_ROOT
                         Root used for master_output.tsv run mappings. Default follows the paths supplied in the request.
   --output-dir OUTPUT_DIR
+  
+rerunning after editing and rerunning 15_ from gc_analysis
+python 06_nhphyml_to_tsvs_v4.py \
+--sql-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs
 
-
+ OK because of the amount of time that it took to run alignments for each of the comparisons I think I need to make sure that whatever accessions are in the manifest match whatever I ran the alignment on. So I think I need to walk through the scripts and confirm that all the scripts are using the manifest as a reference.
 *Note to self, it may make sense to make a final validation script that takes the schema as an input*
 
 =============================================================================================================================================================================================
