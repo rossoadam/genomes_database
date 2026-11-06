@@ -259,146 +259,215 @@ python 04_build_compleasm_feature_tsvs_v11.py \
 # flank_sets_compleasm rows: 3
 # flank_compleasm_summary rows: 255
 
-YYY-MM-DD HH:MM:SS
-2026-10-14 12:00:00
-
-python 05_to_sql_compleasm_features_v6.py \
+python 05_to_sql_compleasm_features_v7.py \
   --input-dir /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features \
   --starter-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs \
   --nhphyml-runs-tsv /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_runs.tsv \
-  --tsv-check-only
+  --tsv-check-only \
+  --check-nhphyml-mappings
 
-python 05_to_sql_compleasm_features_v6.py \
-  --input-dir /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features \
-  --starter-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs \
-  --nhphyml-runs-tsv /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_runs.tsv \
-  --tsv-check-only
-[INFO] Running TSV-only validation; MySQL is not used
-[OK] Python executable: /Users/rossoaa/miniconda3/envs/liftoff_2/bin/python (3.10.18)
-[INFO] Ignoring flank_summary.tsv as a compatibility alias; using flank_compleasm_summary.tsv.
-[OK] Required Compleasm TSV inputs found and readable
-[OK] TSV headers match gc3_dynamics_v13_reduced (with explicit legacy alias mapping, if used)
-[INFO] sauropsida_odb12: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/sauropsida_odb12.tsv
-[INFO] orthologs: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/orthologs.tsv
-[INFO] ortholog_initial_qc: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_initial_qc.tsv
-[INFO] ortholog_run_qc: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_run_qc.tsv
-[INFO] ortholog_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_summary.tsv
-[INFO] intron_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/intron_compleasm.tsv
-[INFO] intron_compleasm_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/intron_compleasm_summary.tsv
-[INFO] flanks_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flanks_compleasm.tsv
-[INFO] flank_sets_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flank_sets_compleasm.tsv
-[INFO] flank_compleasm_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flank_compleasm_summary.tsv
-[INFO] genomes: /Users/rossoaa/projects/genomes/records/sql_tsvs/genomes.tsv
-[INFO] sequences: /Users/rossoaa/projects/genomes/records/sql_tsvs/sequences.tsv
-[INFO] natural_history: /Users/rossoaa/projects/genomes/records/sql_tsvs/natural_history.tsv
-[INFO] nhphyml_runs: /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_runs.tsv
-[INFO] Parsing/normalizing TSV rows and building disk-backed validation indexes...
-[OK] sauropsida_odb12: 6,118 incoming rows; accepted=6,118, rejected during parsing=0
-[OK] flank_sets_compleasm: 3 incoming rows; accepted=3, rejected during parsing=0
-[INFO] orthologs: parsed 250,000 rows
-[OK] orthologs: 498,949 incoming rows; accepted=498,949, rejected during parsing=0
-[INFO] ortholog_initial_qc: parsed 250,000 rows
-[ERROR] ortholog_initial_qc: 498,949 incoming rows; accepted=13,795, rejected during parsing=485,154
-[INFO] ortholog_run_qc: parsed 250,000 rows
-[OK] ortholog_run_qc: 311,370 incoming rows; accepted=311,370, rejected during parsing=0
-[OK] ortholog_summary: 85 incoming rows; accepted=85, rejected during parsing=0
-[INFO] intron_compleasm: parsed 250,000 rows
-[INFO] intron_compleasm: parsed 500,000 rows
-[INFO] intron_compleasm: parsed 750,000 rows
-[INFO] intron_compleasm: parsed 1,000,000 rows
-[INFO] intron_compleasm: parsed 1,250,000 rows
-[INFO] intron_compleasm: parsed 1,500,000 rows
-[INFO] intron_compleasm: parsed 1,750,000 rows
-[INFO] intron_compleasm: parsed 2,000,000 rows
-[INFO] intron_compleasm: parsed 2,250,000 rows
-[INFO] intron_compleasm: parsed 2,500,000 rows
-[INFO] intron_compleasm: parsed 2,750,000 rows
-[INFO] intron_compleasm: parsed 3,000,000 rows
-[INFO] intron_compleasm: parsed 3,250,000 rows
-[OK] intron_compleasm: 3,278,970 incoming rows; accepted=3,278,970, rejected during parsing=0
-[OK] intron_compleasm_summary: 85 incoming rows; accepted=85, rejected during parsing=0
-[INFO] flanks_compleasm: parsed 250,000 rows
-[INFO] flanks_compleasm: parsed 500,000 rows
-[INFO] flanks_compleasm: parsed 750,000 rows
-[INFO] flanks_compleasm: parsed 1,000,000 rows
-[OK] flanks_compleasm: 1,240,074 incoming rows; accepted=1,240,074, rejected during parsing=0
-[OK] flank_compleasm_summary: 255 incoming rows; accepted=255, rejected during parsing=0
-[OK] genomes: 85 incoming rows; accepted=85, rejected during parsing=0
-[OK] sequences: 114,705 incoming rows; accepted=114,705, rejected during parsing=0
-[OK] natural_history: 85 incoming rows; accepted=85, rejected during parsing=0
-[ERROR] nhphyml_runs: 4 incoming rows; accepted=0, rejected during parsing=4
-[INFO] Indexed sauropsida_odb12 for offline validation
-[INFO] Indexed orthologs for offline validation
-[INFO] Indexed ortholog_initial_qc for offline validation
-[INFO] Indexed ortholog_run_qc for offline validation
-[INFO] Indexed ortholog_summary for offline validation
-[INFO] Indexed intron_compleasm for offline validation
-[INFO] Indexed intron_compleasm_summary for offline validation
-[INFO] Indexed flanks_compleasm for offline validation
-[INFO] Indexed flank_sets_compleasm for offline validation
-[INFO] Indexed flank_compleasm_summary for offline validation
-[INFO] Indexed genomes for offline validation
-[INFO] Indexed sequences for offline validation
-[INFO] Indexed natural_history for offline validation
-[INFO] Indexed nhphyml_runs for offline validation
-[OK] sauropsida_odb12:odb12_id: duplicate rows=0
-[OK] orthologs:ortholog_pk: duplicate rows=0
-[OK] orthologs:sequence_pk,odb12_id: duplicate rows=0
-[OK] orthologs:genome_pk,odb12_id: duplicate rows=0
-[OK] ortholog_initial_qc:ortholog_pk: duplicate rows=0
-[OK] ortholog_run_qc:ortholog_run_qc_pk: duplicate rows=0
-[OK] ortholog_run_qc:ortholog_pk,nhphyml_run_pk: duplicate rows=0
-[OK] ortholog_summary:ortholog_summary_pk: duplicate rows=0
-[OK] ortholog_summary:genome_pk: duplicate rows=0
-[OK] intron_compleasm:intron_pk: duplicate rows=0
-[OK] intron_compleasm:ortholog_pk,intron_id: duplicate rows=0
-[OK] intron_compleasm_summary:intron_summary_pk: duplicate rows=0
-[OK] intron_compleasm_summary:genome_pk: duplicate rows=0
-[OK] flanks_compleasm:flank_pk: duplicate rows=0
-[OK] flanks_compleasm:ortholog_pk,flank_set_pk: duplicate rows=0
-[OK] flank_sets_compleasm:flank_set_pk: duplicate rows=0
-[OK] flank_sets_compleasm:upstream_bp,downstream_bp: duplicate rows=0
-[OK] flank_compleasm_summary:flank_summary_pk: duplicate rows=0
-[OK] flank_compleasm_summary:genome_pk,flank_set_pk: duplicate rows=0
-[OK] genomes:genome_pk: duplicate rows=0
-[OK] genomes:accession_id: duplicate rows=0
-[OK] sequences:sequence_pk: duplicate rows=0
-[OK] sequences:genome_pk,sequence_id: duplicate rows=0
-[OK] natural_history:species_pk: duplicate rows=0
-[OK] natural_history:species_normalized: duplicate rows=0
-[OK] nhphyml_runs:nhphyml_run_pk: duplicate rows=0
-[OK] nhphyml_runs:run_name: duplicate rows=0
-[OK] ortholog_initial_qc.ortholog_pk -> orthologs.ortholog_pk: rows=13,795, non-NULL=13,795, distinct=13,795, matched=13,795, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] ortholog_initial_qc.genome_pk -> genomes.genome_pk: rows=13,795, non-NULL=13,795, distinct=85, matched=13,795, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] ortholog_initial_qc.sequence_pk -> sequences.sequence_pk: rows=13,795, non-NULL=4,822, distinct=1,358, matched=4,822, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=8,973
-[OK] ortholog_initial_qc.odb12_id -> sauropsida_odb12.odb12_id: rows=13,795, non-NULL=13,795, distinct=4,122, matched=13,795, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] ortholog_run_qc.ortholog_pk -> orthologs.ortholog_pk: rows=311,370, non-NULL=311,370, distinct=131,580, matched=311,370, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[ERROR] ortholog_run_qc.nhphyml_run_pk -> nhphyml_runs.nhphyml_run_pk: rows=311,370, non-NULL=311,370, distinct=4, matched=0, unavailable=311,370, references to rejected parents=311,370, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] orthologs.sequence_pk -> sequences.sequence_pk: rows=498,949, non-NULL=440,206, distinct=3,283, matched=440,206, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=58,743
-[OK] orthologs.genome_pk -> genomes.genome_pk: rows=498,949, non-NULL=498,949, distinct=85, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] orthologs.odb12_id -> sauropsida_odb12.odb12_id: rows=498,949, non-NULL=498,949, distinct=6,092, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] intron_compleasm.ortholog_pk -> orthologs.ortholog_pk: rows=3,278,970, non-NULL=3,278,970, distinct=384,606, matched=3,278,970, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] flanks_compleasm.ortholog_pk -> orthologs.ortholog_pk: rows=1,240,074, non-NULL=1,240,074, distinct=413,358, matched=1,240,074, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] flanks_compleasm.flank_set_pk -> flank_sets_compleasm.flank_set_pk: rows=1,240,074, non-NULL=1,240,074, distinct=3, matched=1,240,074, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] flank_compleasm_summary.flank_set_pk -> flank_sets_compleasm.flank_set_pk: rows=255, non-NULL=255, distinct=3, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] ortholog_summary.genome_pk -> genomes.genome_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] ortholog_summary.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] intron_compleasm_summary.genome_pk -> genomes.genome_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] intron_compleasm_summary.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] flank_compleasm_summary.genome_pk -> genomes.genome_pk: rows=255, non-NULL=255, distinct=85, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] flank_compleasm_summary.species_pk -> natural_history.species_pk: rows=255, non-NULL=255, distinct=85, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] sequences.genome_pk -> genomes.genome_pk: rows=114,705, non-NULL=114,705, distinct=85, matched=114,705, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] genomes.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
-[OK] orthologs: genome_pk differs from the referenced sequence's genome_pk; comparable=440,206, mismatches=0, uncomparable=58,743
-[OK] intron_compleasm: parent_id differs from referenced ortholog odb12_id; comparable=3,278,970, mismatches=0, uncomparable=0
-[OK] ortholog_summary: species_pk differs from the referenced genome's species_pk; comparable=85, mismatches=0, uncomparable=0
-[OK] intron_compleasm_summary: species_pk differs from the referenced genome's species_pk; comparable=85, mismatches=0, uncomparable=0
-[OK] flank_compleasm_summary: species_pk differs from the referenced genome's species_pk; comparable=255, mismatches=0, uncomparable=0
+# [INFO] Running TSV-only validation; MySQL is not used
+# [OK] Python executable: /Users/rossoaa/miniconda3/envs/liftoff_2/bin/python (3.10.18)
+# [INFO] Ignoring flank_summary.tsv as a compatibility alias; using flank_compleasm_summary.tsv.
+# [OK] Required Compleasm TSV inputs found and readable
+# [OK] TSV headers match gc3_dynamics_v13_reduced (with explicit legacy alias mapping, if used)
+# [INFO] sauropsida_odb12: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/sauropsida_odb12.tsv
+# [INFO] orthologs: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/orthologs.tsv
+# [INFO] ortholog_initial_qc: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_initial_qc.tsv
+# [INFO] ortholog_run_qc: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_run_qc.tsv
+# [INFO] ortholog_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_summary.tsv
+# [INFO] intron_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/intron_compleasm.tsv
+# [INFO] intron_compleasm_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/intron_compleasm_summary.tsv
+# [INFO] flanks_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flanks_compleasm.tsv
+# [INFO] flank_sets_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flank_sets_compleasm.tsv
+# [INFO] flank_compleasm_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flank_compleasm_summary.tsv
+# [INFO] genomes: /Users/rossoaa/projects/genomes/records/sql_tsvs/genomes.tsv
+# [INFO] sequences: /Users/rossoaa/projects/genomes/records/sql_tsvs/sequences.tsv
+# [INFO] natural_history: /Users/rossoaa/projects/genomes/records/sql_tsvs/natural_history.tsv
+# [INFO] nhphyml_runs: /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_runs.tsv
+# [INFO] species_name_audit: /Users/rossoaa/projects/genomes/records/sql_tsvs/species_name_audit.tsv
+# [INFO] Parsing/normalizing TSV rows and building disk-backed validation indexes...
+# [OK] sauropsida_odb12: 6,118 incoming rows; accepted=6,118, rejected during parsing=0
+# [OK] flank_sets_compleasm: 3 incoming rows; accepted=3, rejected during parsing=0
+# [INFO] orthologs: parsed 250,000 rows
+# [OK] orthologs: 498,949 incoming rows; accepted=498,949, rejected during parsing=0
+# [INFO] ortholog_initial_qc: parsed 250,000 rows
+# [OK] ortholog_initial_qc: 498,949 incoming rows; accepted=498,949, rejected during parsing=0
+# [INFO] ortholog_run_qc: parsed 250,000 rows
+# [OK] ortholog_run_qc: 311,370 incoming rows; accepted=311,370, rejected during parsing=0
+# [OK] ortholog_summary: 85 incoming rows; accepted=85, rejected during parsing=0
+# [INFO] intron_compleasm: parsed 250,000 rows
+# [INFO] intron_compleasm: parsed 500,000 rows
+# [INFO] intron_compleasm: parsed 750,000 rows
+# [INFO] intron_compleasm: parsed 1,000,000 rows
+# [INFO] intron_compleasm: parsed 1,250,000 rows
+# [INFO] intron_compleasm: parsed 1,500,000 rows
+# [INFO] intron_compleasm: parsed 1,750,000 rows
+# [INFO] intron_compleasm: parsed 2,000,000 rows
+# [INFO] intron_compleasm: parsed 2,250,000 rows
+# [INFO] intron_compleasm: parsed 2,500,000 rows
+# [INFO] intron_compleasm: parsed 2,750,000 rows
+# [INFO] intron_compleasm: parsed 3,000,000 rows
+# [INFO] intron_compleasm: parsed 3,250,000 rows
+# [OK] intron_compleasm: 3,278,970 incoming rows; accepted=3,278,970, rejected during parsing=0
+# [OK] intron_compleasm_summary: 85 incoming rows; accepted=85, rejected during parsing=0
+# [INFO] flanks_compleasm: parsed 250,000 rows
+# [INFO] flanks_compleasm: parsed 500,000 rows
+# [INFO] flanks_compleasm: parsed 750,000 rows
+# [INFO] flanks_compleasm: parsed 1,000,000 rows
+# [OK] flanks_compleasm: 1,240,074 incoming rows; accepted=1,240,074, rejected during parsing=0
+# [OK] flank_compleasm_summary: 255 incoming rows; accepted=255, rejected during parsing=0
+# [OK] genomes: 85 incoming rows; accepted=85, rejected during parsing=0
+# [OK] sequences: 114,705 incoming rows; accepted=114,705, rejected during parsing=0
+# [OK] natural_history: 85 incoming rows; accepted=85, rejected during parsing=0
+# [OK] nhphyml_runs: 4 incoming rows; accepted=4, rejected during parsing=0
+# [OK] species_name_audit: 25,496 incoming rows; accepted=25,496, rejected during parsing=0
+# [INFO] Indexed sauropsida_odb12 for offline validation
+# [INFO] Indexed orthologs for offline validation
+# [INFO] Indexed ortholog_initial_qc for offline validation
+# [INFO] Indexed ortholog_run_qc for offline validation
+# [INFO] Indexed ortholog_summary for offline validation
+# [INFO] Indexed intron_compleasm for offline validation
+# [INFO] Indexed intron_compleasm_summary for offline validation
+# [INFO] Indexed flanks_compleasm for offline validation
+# [INFO] Indexed flank_sets_compleasm for offline validation
+# [INFO] Indexed flank_compleasm_summary for offline validation
+# [INFO] Indexed genomes for offline validation
+# [INFO] Indexed sequences for offline validation
+# [INFO] Indexed natural_history for offline validation
+# [INFO] Indexed nhphyml_runs for offline validation
+# [INFO] Indexed species_name_audit for offline validation
+# [OK] sauropsida_odb12:odb12_id: duplicate rows=0
+# [OK] orthologs:ortholog_pk: duplicate rows=0
+# [OK] orthologs:sequence_pk,odb12_id: duplicate rows=0
+# [OK] orthologs:genome_pk,odb12_id: duplicate rows=0
+# [OK] ortholog_initial_qc:ortholog_pk: duplicate rows=0
+# [OK] ortholog_run_qc:ortholog_run_qc_pk: duplicate rows=0
+# [OK] ortholog_run_qc:ortholog_pk,nhphyml_run_pk: duplicate rows=0
+# [OK] ortholog_summary:ortholog_summary_pk: duplicate rows=0
+# [OK] ortholog_summary:genome_pk: duplicate rows=0
+# [OK] intron_compleasm:intron_pk: duplicate rows=0
+# [OK] intron_compleasm:ortholog_pk,intron_id: duplicate rows=0
+# [OK] intron_compleasm_summary:intron_summary_pk: duplicate rows=0
+# [OK] intron_compleasm_summary:genome_pk: duplicate rows=0
+# [OK] flanks_compleasm:flank_pk: duplicate rows=0
+# [OK] flanks_compleasm:ortholog_pk,flank_set_pk: duplicate rows=0
+# [OK] flank_sets_compleasm:flank_set_pk: duplicate rows=0
+# [OK] flank_sets_compleasm:upstream_bp,downstream_bp: duplicate rows=0
+# [OK] flank_compleasm_summary:flank_summary_pk: duplicate rows=0
+# [OK] flank_compleasm_summary:genome_pk,flank_set_pk: duplicate rows=0
+# [OK] genomes:genome_pk: duplicate rows=0
+# [OK] genomes:accession_id: duplicate rows=0
+# [OK] sequences:sequence_pk: duplicate rows=0
+# [OK] sequences:genome_pk,sequence_id: duplicate rows=0
+# [OK] natural_history:species_pk: duplicate rows=0
+# [OK] natural_history:species_normalized: duplicate rows=0
+# [OK] nhphyml_runs:nhphyml_run_pk: duplicate rows=0
+# [OK] nhphyml_runs:run_name: duplicate rows=0
+# [OK] species_name_audit:species_name_audit_pk: duplicate rows=0
+# [OK] ortholog_initial_qc.ortholog_pk -> orthologs.ortholog_pk: rows=498,949, non-NULL=498,949, distinct=498,949, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] ortholog_initial_qc.genome_pk -> genomes.genome_pk: rows=498,949, non-NULL=498,949, distinct=85, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] ortholog_initial_qc.sequence_pk -> sequences.sequence_pk: rows=498,949, non-NULL=440,206, distinct=3,283, matched=440,206, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=58,743
+# [OK] ortholog_initial_qc.odb12_id -> sauropsida_odb12.odb12_id: rows=498,949, non-NULL=498,949, distinct=6,092, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] ortholog_run_qc.ortholog_pk -> orthologs.ortholog_pk: rows=311,370, non-NULL=311,370, distinct=131,580, matched=311,370, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] ortholog_run_qc.nhphyml_run_pk -> nhphyml_runs.nhphyml_run_pk: rows=311,370, non-NULL=311,370, distinct=4, matched=311,370, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] orthologs.sequence_pk -> sequences.sequence_pk: rows=498,949, non-NULL=440,206, distinct=3,283, matched=440,206, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=58,743
+# [OK] orthologs.genome_pk -> genomes.genome_pk: rows=498,949, non-NULL=498,949, distinct=85, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] orthologs.odb12_id -> sauropsida_odb12.odb12_id: rows=498,949, non-NULL=498,949, distinct=6,092, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] intron_compleasm.ortholog_pk -> orthologs.ortholog_pk: rows=3,278,970, non-NULL=3,278,970, distinct=384,606, matched=3,278,970, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] flanks_compleasm.ortholog_pk -> orthologs.ortholog_pk: rows=1,240,074, non-NULL=1,240,074, distinct=413,358, matched=1,240,074, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] flanks_compleasm.flank_set_pk -> flank_sets_compleasm.flank_set_pk: rows=1,240,074, non-NULL=1,240,074, distinct=3, matched=1,240,074, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] flank_compleasm_summary.flank_set_pk -> flank_sets_compleasm.flank_set_pk: rows=255, non-NULL=255, distinct=3, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] ortholog_summary.genome_pk -> genomes.genome_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] ortholog_summary.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] intron_compleasm_summary.genome_pk -> genomes.genome_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] intron_compleasm_summary.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] flank_compleasm_summary.genome_pk -> genomes.genome_pk: rows=255, non-NULL=255, distinct=85, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] flank_compleasm_summary.species_pk -> natural_history.species_pk: rows=255, non-NULL=255, distinct=85, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] sequences.genome_pk -> genomes.genome_pk: rows=114,705, non-NULL=114,705, distinct=85, matched=114,705, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] genomes.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] species_name_audit.species_pk -> natural_history.species_pk: rows=25,496, non-NULL=425, distinct=85, matched=425, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=25,071
+# [OK] orthologs: genome_pk differs from the referenced sequence's genome_pk; comparable=440,206, mismatches=0, uncomparable=58,743
+# [OK] intron_compleasm: parent_id differs from referenced ortholog odb12_id; comparable=3,278,970, mismatches=0, uncomparable=0
+# [OK] ortholog_summary: species_pk differs from the referenced genome's species_pk; comparable=85, mismatches=0, uncomparable=0
+# [OK] intron_compleasm_summary: species_pk differs from the referenced genome's species_pk; comparable=85, mismatches=0, uncomparable=0
+# [OK] flank_compleasm_summary: species_pk differs from the referenced genome's species_pk; comparable=255, mismatches=0, uncomparable=0
+# [OK] initial-QC coverage: orthologs.ortholog_pk -> ortholog_initial_qc.ortholog_pk: rows=498,949, non-NULL=498,949, distinct=498,949, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+# [OK] ortholog_initial_qc: genome_pk differs from referenced ortholog identity (NULL-safe); comparable=498,949, mismatches=0, uncomparable=0
+# [OK] ortholog_initial_qc: sequence_pk differs from referenced ortholog identity (NULL-safe); comparable=498,949, mismatches=0, uncomparable=0
+# [OK] ortholog_initial_qc: odb12_id differs from referenced ortholog identity (NULL-safe); comparable=498,949, mismatches=0, uncomparable=0
+# [OK] ortholog_initial_qc: invalid raw_cds_qc; allowed labels=('pass', 'fail'); comparable=488,332, mismatches=0, uncomparable=10,617
+# [OK] ortholog_initial_qc: invalid macse_qc; allowed labels=('pass', 'fail'); comparable=485,154, mismatches=0, uncomparable=13,795
+# [OK] ortholog_initial_qc: invalid final_qc; allowed labels=('passing', 'rescued', 'unsuitable', 'alignment-problematic'); comparable=485,154, mismatches=0, uncomparable=13,795
+# [OK] ortholog_run_qc: invalid final_alignment_qc; allowed labels=('pass', 'fail'); comparable=311,370, mismatches=0, uncomparable=0
+# [OK] ortholog_initial_qc: raw/MACSE/final QC combination disagrees; comparable=485,154, mismatches=0, uncomparable=13,795
+# [OK] ortholog_run_qc: TRUE inclusion requires final_alignment_qc=pass; comparable=311,370, mismatches=0, uncomparable=0
+# [INFO] Checking nhPhyML reference mappings (not run inputs or result files)...
+# [INFO] nhPhyML species mapping route: audit.species_pk -> genomes.species_pk
+# [INFO] Audit rows usable for the selected route=425, NULL name/ID excluded from that route=25,071
+# [INFO] nhPhyML references: resolved ortholog rows=498,949, focal genomes=85, resolved species names=85, audit names without a genome=0
+# [WARN] Offline text comparisons are exact; live SQL collations, string lengths, existing SQL records and upload safety must still be checked in MySQL mode.
+# [OK] TSV relationship validation passed. No source TSV or SQL data changed.
+# [OK] Reference mappings passed the requested nhPhyML readiness checks (reference scope only).
 
 conda deactivate
 conda activate bio
-python 06_nhphyml_to_tsvs_v4.py \
+python 06_nhphyml_to_tsvs_v6.py \
 --sql-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs
+
+# ===============================================================================
+# WARNING: MANUAL nhPhyML METADATA FILES ARE REQUIRED
+# ===============================================================================
+# You must manually create tree_files.tsv and nhphyml_runs.tsv.
+# The script does NOT generate these two metadata files.
+# 
+# tree_files.tsv fields:
+#   tree_pk	nhphyml_run_pk	tree_type	tree_text	branch_length_type	notes
+# nhphyml_runs.tsv fields (canonical v13 schema):
+#   nhphyml_run_pk	run_name	alignment_name	n_species	n_genes	notes	created_at
+#   created_at is nullable; use \N if you do not want to assign it manually.
+#   Legacy six-column nhphyml_runs.tsv files from v1-v3 remain accepted with a warning.
+# ===============================================================================
+# 
+# [INFO] SQL TSV directory: /Users/rossoaa/projects/genomes/records/sql_tsvs
+# [INFO] Inferred alignment root from --sql-tsv-dir: /Users/rossoaa/projects/genomes/records/compleasm/alignments
+# [INFO] Ortholog run root: /Users/rossoaa/projects/genomes/records/compleasm/alignments
+# [INFO] Species-summary run root: /Users/rossoaa/projects/genomes/records/compleasm/alignments
+# [INFO] Output directory: /Users/rossoaa/projects/genomes/records/sql_tsvs
+# [INFO] Compatibility target: gc3_dynamics_v13_reduced schema.
+# [INFO] v13 ortholog contract: genome_pk and odb12_id are required; sequence_pk is nullable.
+# [INFO] v13 ortholog identity: genome_pk + odb12_id must uniquely resolve ortholog_pk.
+# [INFO] SQL TSV null convention: \N is interpreted as NULL.
+# [OK] SQL NULL numeric-validation self-checks passed.
+# [OK] v13 ortholog-contract self-checks passed.
+# [OK] nhphyml_runs.tsv (canonical v13) has the required run PKs 1-4.
+# [OK] tree_files.tsv has the required columns and unique keys.
+# [INFO] Species-to-genome mappings available: 85
+# [INFO] Genome+ODB12-to-ortholog mappings available: 498,949
+# 
+# [INFO] Processing nhPhyML run 1: t1.0_e1_o5_with_i_braminus
+# [WARNING] Run 1: 50,955 GC3 row(s) did not match a GC4 value; gc4 will be blank for those rows.
+# [INFO] Run 1: retained 51,600 extant-species rows; dropped 50,955 unresolved/internal-node rows.
+# [INFO] Run 1: retained 80/80 species-summary row(s).
+# 
+# [INFO] Processing nhPhyML run 2: t1.0_e1_o15_with_i_braminus
+# [WARNING] Run 2: 82,041 GC3 row(s) did not match a GC4 value; gc4 will be blank for those rows.
+# [INFO] Run 2: retained 83,230 extant-species rows; dropped 82,041 unresolved/internal-node rows.
+# [INFO] Run 2: retained 70/70 species-summary row(s).
+# 
+# [INFO] Processing nhPhyML run 3: t1.0_e1_o25_with_i_braminus
+# [WARNING] Run 3: 105,846 GC3 row(s) did not match a GC4 value; gc4 will be blank for those rows.
+# [INFO] Run 3: retained 107,640 extant-species rows; dropped 105,846 unresolved/internal-node rows.
+# [INFO] Run 3: retained 60/60 species-summary row(s).
+# 
+# [INFO] Processing nhPhyML run 4: t1.0_e1_o35_with_i_braminus
+# [WARNING] Run 4: 127,841 GC3 row(s) did not match a GC4 value; gc4 will be blank for those rows.
+# [INFO] Run 4: retained 130,450 extant-species rows; dropped 127,841 unresolved/internal-node rows.
+# [INFO] Run 4: retained 50/50 species-summary row(s).
+# 
+# [OK] Finished.
+# [OK] Wrote 372,920 rows to /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_ortholog_results.tsv
+# [OK] Wrote 260 rows to /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_species_summary.tsv
 
 ------------------------------------------------------------------
 ##################################################################
