@@ -1,3 +1,416 @@
+------------------------------------------------------------------
+##################################################################
+------------------------------------------------------------------
+##################################################################
+------------------------------------------------------------------
+##################################################################
+------------------------------------------------------------------
+##################################################################
+------------------------------------------------------------------
+##################################################################
+2026oct29
+
+python 00a_natural_history_standardized_and_name_audit_v6.py \
+/Users/rossoaa/projects/genomes \
+        --manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+        --genome-size /Users/rossoaa/projects/genomes/records/natural_history/reptile_summary/species_summary.csv \
+        --traits-oskyrko /Users/rossoaa/projects/genomes/records/natural_history/oskyrko_et_al_2024_repttraits.csv \
+        --mass-title /Users/rossoaa/projects/genomes/records/natural_history/title_at_al_data.csv \
+        --mass-ji /Users/rossoaa/projects/genomes/records/natural_history/ji_et_al.tsv \
+        --thermal-bennett /Users/rossoaa/projects/genomes/records/natural_history/bennett_et_al_2019_globaltherm_upload_10_11_17.csv
+
+# [OK] Loaded 85 focal species from /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv (manifest)
+# [INFO] Reusing previous 00a species_pk mapping for 85 species from /Users/rossoaa/projects/genomes/records/natural_history_standardized/natural_history_standardized.tsv
+# [OK] Canonical species_pk resolved for all 85 focal species
+# [INFO] Authority: 00a owns species_pk; natural_history_standardized.tsv is the canonical downstream handoff
+# [INFO] Reused species_pk source(s): /Users/rossoaa/projects/genomes/records/natural_history_standardized/natural_history_standardized.tsv
+# [OK] species_name_audit columns match the required SQL order
+# [OK] species_name_audit_pk is non-null, numeric, unique, and sequential from 1..25,496
+# [OK] All 425 non-null species_pk values are numeric and integer-valued
+# [OK] species_pk status rules pass: matched and missing_trait are populated; unmatched_raw_trait is NULL
+# [OK] Each of the 85 focal normalized species maps to exactly one canonical species_pk
+# [OK] species_name_audit species_pk values agree with the authoritative focal-species mapping
+# [OK] Wrote /Users/rossoaa/projects/genomes/records/natural_history_standardized/natural_history_standardized.tsv (85 focal species; genome_size=17, mass_preferred=84, ct_max=19, ct_min=11)
+# [OK] Wrote /Users/rossoaa/projects/genomes/records/sql_tsvs/species_name_audit.tsv (rows=25,496, matched=203, unmatched_raw_trait=25071, missing_trait=222)
+# [INFO] species_name_audit.tsv SQL NULL representation: \\N
+# [INFO] 00a owns canonical species_pk assignment; natural_history_standardized.tsv is the authoritative handoff to 00b
+# [INFO] reused species_pk source(s): /Users/rossoaa/projects/genomes/records/natural_history_standardized/natural_history_standardized.tsv
+# [DONE] Natural-history standardization and species-name audit complete.
+# [INFO] Canonical join key: species_normalized
+# [INFO] Preferred mass priority: oskyrko > title > ji
+
+python 00b_build_starter_sql_tsvs_v17.py \
+	--genomes-dir /Users/rossoaa/projects/genomes \
+	--manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+	--natural-history /Users/rossoaa/projects/genomes/records/natural_history_standardized/natural_history_standardized.tsv \
+    --species-name-audit /Users/rossoaa/projects/genomes/records/sql_tsvs/species_name_audit.tsv \
+    --output-dir /Users/rossoaa/projects/genomes/records/sql_tsvs/ \
+    --all-accessions
+    
+# [OK] Wrote SQL TSVs:
+#   /Users/rossoaa/projects/genomes/records/sql_tsvs/natural_history.tsv	85 data rows
+#   /Users/rossoaa/projects/genomes/records/sql_tsvs/species_name_audit.tsv	25496 data rows
+#   /Users/rossoaa/projects/genomes/records/sql_tsvs/genomes.tsv	85 data rows
+#   /Users/rossoaa/projects/genomes/records/sql_tsvs/sequences.tsv	114705 data rows
+#   /Users/rossoaa/projects/genomes/records/sql_tsvs/sequence_type_audit.tsv	85 data rows
+#   /Users/rossoaa/projects/genomes/records/sql_tsvs/analysis_run.tsv	1 data rows
+#   /Users/rossoaa/projects/genomes/records/sql_tsvs/window_set.tsv	340 data rows
+#   /Users/rossoaa/projects/genomes/records/sql_tsvs/window_chunk_manifest.tsv	1360 data rows
+# 
+# [WARN] Sequence type audit rows needing review:
+#   GCA_003113815.1	status=missing_ncbi_stats	chromosomes=0/\N	components=16536/16536
+#   GCA_014337955.2	status=review	chromosomes=23/23	components=3514/3513
+#   GCA_020142125.1	status=review	chromosomes=18/17	components=5291/5291
+#   GCA_030015325.2	status=review	chromosomes=16/16	components=37/36
+#   GCA_030412105.1	status=review	chromosomes=19/19	components=30/29
+#   GCA_038048745.1	status=review	chromosomes=19/19	components=273/272
+#   GCA_039797435.1	status=review	chromosomes=19/19	components=27/26
+#   GCA_039880765.1	status=review	chromosomes=18/18	components=179/178
+#   GCA_041380405.1	status=review	chromosomes=16/16	components=21/20
+#   GCA_041722995.2	status=review	chromosomes=36/16	components=172/171
+#   GCA_046524025.1	status=review	chromosomes=19/19	components=222/221
+#   GCA_051529865.1	status=review	chromosomes=19/19	components=1262/1261
+#   GCA_053572275.1	status=review	chromosomes=23/23	components=3148/3147
+#   GCA_055504975.1	status=review	chromosomes=16/16	components=17/16
+#   GCA_055824665.1	status=review	chromosomes=18/18	components=111/110
+#   GCA_947247035.1	status=review	chromosomes=19/19	components=384/383
+#   GCA_947686815.1	status=review	chromosomes=20/20	components=2149/2148
+#   GCA_964106915.2	status=review	chromosomes=20/20	components=211/210
+#   GCA_964188175.1	status=review	chromosomes=20/20	components=294/293
+#   GCA_964188305.1	status=review	chromosomes=20/20	components=507/506
+#   GCA_964252035.1	status=review	chromosomes=20/20	components=326/325
+#   GCA_964265115.1	status=review	chromosomes=23/23	components=61/60
+#   GCA_964270895.1	status=review	chromosomes=20/20	components=349/348
+#   GCA_964273705.1	status=review	chromosomes=18/18	components=487/486
+#   GCA_964340495.1	status=review	chromosomes=19/19	components=111/110
+#   GCA_964659585.1	status=review	chromosomes=18/18	components=210/209
+#   GCA_965112155.1	status=review	chromosomes=20/20	components=290/289
+#   GCA_965194845.1	status=review	chromosomes=18/18	components=535/534
+#   GCA_965280105.1	status=review	chromosomes=15/15	components=44/43
+#   GCA_965636955.1	status=review	chromosomes=21/21	components=78/77
+#   GCF_009819535.1	status=review	chromosomes=20/20	components=29/28
+#   GCF_028583425.1	status=review	chromosomes=19/19	components=76/75
+#   GCF_032191835.1	status=review	chromosomes=21/21	components=661/660
+#   GCF_051106095.1	status=review	chromosomes=18/18	components=90/89
+#   GCF_951804945.1	status=review	chromosomes=19/19	components=51/50
+#   GCF_964188315.1	status=review	chromosomes=20/20	components=185/184
+#   GWHFILM00000000.1	status=missing_ncbi_stats	chromosomes=40/\N	components=40/\N
+  
+python 00c_build_tsvs_from_gff.py \
+    /Users/rossoaa/projects/genomes \
+    --manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+    --metadata /Users/rossoaa/projects/genomes/records/genomes_metadata.csv
+
+# WARNING: GCA_964106635.2: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964106915.2: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964188175.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964188305.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964234825.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964252035.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964265115.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964270895.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964273705.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964340495.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_964659585.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_965112155.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_965113305.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_965153305.2: path_to_gff is empty; accession skipped.
+# WARNING: GCA_965194845.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_965280105.1: path_to_gff is empty; accession skipped.
+# WARNING: GCA_965636955.1: path_to_gff is empty; accession skipped.
+# Wrote 1,881,213 gene rows to: /Users/rossoaa/projects/genomes/records/sql_tsvs/genes.tsv
+# Wrote 1,194,613 IGS rows to: /Users/rossoaa/projects/genomes/records/sql_tsvs/igs.tsv
+# Wrote 85 gene summary rows to: /Users/rossoaa/projects/genomes/records/sql_tsvs/gene_summary.tsv
+# Wrote 85 IGS summary rows to: /Users/rossoaa/projects/genomes/records/sql_tsvs/igs_summary.tsv
+
+conda deactivate
+conda activate mysql
+python 01_load_starter_sql_tsvs_v5.py \
+--tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs \
+--mysql-db gc3_dynamics \
+--mysql-user root \
+--mysql-password * \
+--dry-run
+
+python 03_raw_ortholog_validity_batch_v4.py \
+/Users/rossoaa/projects/genomes \
+--manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+--qc-script /Users/rossoaa/projects/strength_of_gene_conversion/genomes_database/compleasm_database/04b_qualtiy_control_v2.py \
+--dry-run
+
+python 03_raw_ortholog_validity_batch_v4.py \
+/Users/rossoaa/projects/genomes \
+--manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+--qc-script /Users/rossoaa/projects/strength_of_gene_conversion/genomes_database/compleasm_database/04b_qualtiy_control_v2.py  
+
+# Manifest: /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv (85 accessions)
+# Existing QC TSV: /Users/rossoaa/projects/genomes/records/compleasm/records/ortholog_validity/body-size-dna-dynamics_manifest/ortholog_validity.tsv (485154 records)
+# Raw CDS QC implementation: /Users/rossoaa/projects/strength_of_gene_conversion/genomes_database/compleasm_database/04b_qualtiy_control_v2.py (v2; SHA256 7808ff1e519f2e73…)
+# Scanning original Compleasm output without an occupancy threshold...
+#   10/85 accessions visited; 56,831 CDS records assessed
+#   20/85 accessions visited; 114,020 CDS records assessed
+#   30/85 accessions visited; 172,269 CDS records assessed
+#   40/85 accessions visited; 229,197 CDS records assessed
+#   50/85 accessions visited; 286,121 CDS records assessed
+#   60/85 accessions visited; 342,999 CDS records assessed
+#   70/85 accessions visited; 400,922 CDS records assessed
+#   80/85 accessions visited; 459,136 CDS records assessed
+# 
+# ============================================================================
+# RAW COMPLEASM QC EXPANSION — COMPLETE
+# ============================================================================
+# script_version                             v4
+# execution_timestamp                        2026-11-02T17:37:50
+# genomes_dir                                /Users/rossoaa/projects/genomes
+# manifest                                   /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv
+# manifest_genomes                           85
+# genome_directories_found                   85
+# genomes_with_readable_compleasm_and_fasta  85
+# unique_eligible_accession_ortholog_records 488332
+# unique_eligible_ortholog_ids               6091
+# excluded_records_by_compleasm_status       31696
+# successfully_assessed_eligible_records     488332
+# unassessable_eligible_records              0
+# recalculated_raw_qc_pass                   460261
+# recalculated_raw_qc_fail                   28071
+# original_qc_records                        485154
+# matched_existing_records                   485154
+# newly_added_records                        3178
+# existing_records_with_fields_completed     0
+# individual_raw_fields_completed            0
+# existing_records_preserved_without_change  485154
+# discrepancies                              0
+# unmatched_existing_records                 0
+# total_updated_qc_records                   488332
+# total_stored_raw_pass                      460261
+# total_stored_raw_fail                      28071
+# records_without_macse_assessment           3178
+# final_qc_passing                           456343
+# final_qc_rescued                           39
+# final_qc_unsuitable                        27448
+# final_qc_alignment_problematic             1324
+# qc_script                                  /Users/rossoaa/projects/strength_of_gene_conversion/genomes_database/compleasm_database/04b_qualtiy_control_v2.py
+# qc_script_sha256                           7808ff1e519f2e731b7eae5decc61aec91b642c173df55a7a0a4039316533b89
+# qc_version                                 v2
+# genetic_code                               1
+# max_raw_ambiguous_fraction                 0.05
+# max_raw_invalid_fraction                   0.0
+# input_tsv_sha256                           5d6207ff1ea44c411e50f40e7a55e88c1ccb78943f1032d4811979719f5a9e09
+# tsv_changed                                true
+# excluded_duplicated                        7336
+# excluded_fragmented                        3279
+# excluded_missing                           21081
+# output_tsv_sha256                          375d5518fab51f407862a9bd599cdcb738da3b837a65b16798a4cfa77285f499
+# Backup: /Users/rossoaa/projects/genomes/records/compleasm/records/ortholog_validity/body-size-dna-dynamics_manifest/qc_expansion_runs/20261102_173750_994303/ortholog_validity_before_v4_20261102_173750_994303.tsv
+# Diagnostics: /Users/rossoaa/projects/genomes/records/compleasm/records/ortholog_validity/body-size-dna-dynamics_manifest/qc_expansion_runs/20261102_173750_994303
+
+python 04_build_compleasm_feature_tsvs_v11.py \
+--genomes /Users/rossoaa/projects/genomes \
+--manifest /Users/rossoaa/projects/genomes/records/project_manifests/body-size-dna-dynamics_manifest.csv \
+--orthodb /Users/rossoaa/projects/genomes/records/compleasm/mb_downloads/sauropsida_odb12.2025-07-01.tar.gz \
+--sequences-tsv /Users/rossoaa/projects/genomes/records/sql_tsvs/sequences.tsv \
+--genomes-tsv /Users/rossoaa/projects/genomes/records/sql_tsvs/genomes.tsv \
+--ortholog-validation /Users/rossoaa/projects/genomes/records/compleasm/records/ortholog_validity/body-size-dna-dynamics_manifest/ortholog_validity.tsv \
+--nhphyml-runs /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_runs.tsv \
+--outdir /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features \
+--run-config /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_run_qc_config.tsv
+
+# Initial QC: total= 498949 eligible= 488332 ineligible= 10617 matched= 488332 raw pass= 460261 raw fail= 28071 without MACSE= 3178 unmapped genomic sequence_pk= 58743 initial final QC categories= {'passing': 456343, 'unsuitable': 27448, 'alignment-problematic': 1324, 'rescued': 39}
+# Processing run-specific QC ...
+#   Run 1 (80_2026oct14): selected genomes=80, distinct ODB12=477, evaluated sequences=38160, pass=38160, fail=0, present=38160, absent=0, unknown=0, pass-but-absent=0
+#   Run 2 (70_2026oct14): selected genomes=70, distinct ODB12=1085, evaluated sequences=75950, pass=75950, fail=0, present=75950, absent=0, unknown=0, pass-but-absent=0
+#   Run 3 (60_2026oct14): selected genomes=60, distinct ODB12=1626, evaluated sequences=97560, pass=97560, fail=0, present=97560, absent=0, unknown=0, pass-but-absent=0
+#   Run 4 (50_2026oct14): selected genomes=50, distinct ODB12=1994, evaluated sequences=99700, pass=99700, fail=0, present=99700, absent=0, unknown=0, pass-but-absent=0
+# Run QC rows: 311370; run-selection audit rows: 1995796
+# Staged relational checks passed: 498949 orthologs/initial-QC pairs, 311370 run-QC records, audit FK associations
+# v13 ortholog uniqueness and unresolved-copy feature exclusion passed: 498949 identities, 7336 unresolved; 5632 provenance-verified
+# SQL NULL serialization validation passed: 16 generated TSVs; 8361951 data rows; 12679282 \N cells; 0 unexpected empty fields
+# v11 serialization checks passed: 16 TSVs validated, 12679282 SQL NULL markers, 0 unexpected empty cells; relational integrity passed
+# Compleasm duplicate-resolution summary:
+#   Parsed full_table records: 518064
+#   Unique accession/ODB12 identities: 498949
+#   Identities with repeated records: 12968
+#   Identical groups collapsed: 0
+#   Ambiguous ineligible groups retained: 7336
+#   Ambiguous eligible groups rejected: 0 (successful build requires 0)
+#   Eligible Indotyphlops groups examined: 5632
+#   Provenance-verified Indotyphlops groups: 5632
+#   Provenance failures: 0
+#   Genomic CDS comparison passes: 5632
+#   Genomic CDS comparison mismatches: 0
+#   Provenance-verified genomic introns: 43586
+#   Provenance-verified genomic flanks: 16068
+#   Duplicate-audit source-copy records: 32083
+#   Orthologs with deliberately unresolved coordinates: 7336
+#   v13 relational integrity: passed
+#   SQL NULL serialization: passed
+# 
+# Finished building Compleasm feature TSVs.
+# Output directory: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features
+# sauropsida_odb12 rows: 6118
+# orthologs rows: 498949
+# ortholog_source_audit rows: 498949
+# Ortholog rows retaining CDS GC without sequence_pk: 46903
+# ortholog_source_audit.tsv is a helper file; do not load it as a SQL table.
+# ortholog_summary rows: 85
+# intron_compleasm rows: 3278970
+# intron_compleasm_summary rows: 85
+# flanks_compleasm rows: 1240074
+# flank_sets_compleasm rows: 3
+# flank_compleasm_summary rows: 255
+
+YYY-MM-DD HH:MM:SS
+2026-10-14 12:00:00
+
+python 05_to_sql_compleasm_features_v6.py \
+  --input-dir /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features \
+  --starter-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs \
+  --nhphyml-runs-tsv /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_runs.tsv \
+  --tsv-check-only
+
+python 05_to_sql_compleasm_features_v6.py \
+  --input-dir /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features \
+  --starter-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs \
+  --nhphyml-runs-tsv /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_runs.tsv \
+  --tsv-check-only
+[INFO] Running TSV-only validation; MySQL is not used
+[OK] Python executable: /Users/rossoaa/miniconda3/envs/liftoff_2/bin/python (3.10.18)
+[INFO] Ignoring flank_summary.tsv as a compatibility alias; using flank_compleasm_summary.tsv.
+[OK] Required Compleasm TSV inputs found and readable
+[OK] TSV headers match gc3_dynamics_v13_reduced (with explicit legacy alias mapping, if used)
+[INFO] sauropsida_odb12: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/sauropsida_odb12.tsv
+[INFO] orthologs: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/orthologs.tsv
+[INFO] ortholog_initial_qc: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_initial_qc.tsv
+[INFO] ortholog_run_qc: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_run_qc.tsv
+[INFO] ortholog_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/ortholog_summary.tsv
+[INFO] intron_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/intron_compleasm.tsv
+[INFO] intron_compleasm_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/intron_compleasm_summary.tsv
+[INFO] flanks_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flanks_compleasm.tsv
+[INFO] flank_sets_compleasm: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flank_sets_compleasm.tsv
+[INFO] flank_compleasm_summary: /Users/rossoaa/projects/genomes/records/sql_tsvs/compleasm_features/flank_compleasm_summary.tsv
+[INFO] genomes: /Users/rossoaa/projects/genomes/records/sql_tsvs/genomes.tsv
+[INFO] sequences: /Users/rossoaa/projects/genomes/records/sql_tsvs/sequences.tsv
+[INFO] natural_history: /Users/rossoaa/projects/genomes/records/sql_tsvs/natural_history.tsv
+[INFO] nhphyml_runs: /Users/rossoaa/projects/genomes/records/sql_tsvs/nhphyml_runs.tsv
+[INFO] Parsing/normalizing TSV rows and building disk-backed validation indexes...
+[OK] sauropsida_odb12: 6,118 incoming rows; accepted=6,118, rejected during parsing=0
+[OK] flank_sets_compleasm: 3 incoming rows; accepted=3, rejected during parsing=0
+[INFO] orthologs: parsed 250,000 rows
+[OK] orthologs: 498,949 incoming rows; accepted=498,949, rejected during parsing=0
+[INFO] ortholog_initial_qc: parsed 250,000 rows
+[ERROR] ortholog_initial_qc: 498,949 incoming rows; accepted=13,795, rejected during parsing=485,154
+[INFO] ortholog_run_qc: parsed 250,000 rows
+[OK] ortholog_run_qc: 311,370 incoming rows; accepted=311,370, rejected during parsing=0
+[OK] ortholog_summary: 85 incoming rows; accepted=85, rejected during parsing=0
+[INFO] intron_compleasm: parsed 250,000 rows
+[INFO] intron_compleasm: parsed 500,000 rows
+[INFO] intron_compleasm: parsed 750,000 rows
+[INFO] intron_compleasm: parsed 1,000,000 rows
+[INFO] intron_compleasm: parsed 1,250,000 rows
+[INFO] intron_compleasm: parsed 1,500,000 rows
+[INFO] intron_compleasm: parsed 1,750,000 rows
+[INFO] intron_compleasm: parsed 2,000,000 rows
+[INFO] intron_compleasm: parsed 2,250,000 rows
+[INFO] intron_compleasm: parsed 2,500,000 rows
+[INFO] intron_compleasm: parsed 2,750,000 rows
+[INFO] intron_compleasm: parsed 3,000,000 rows
+[INFO] intron_compleasm: parsed 3,250,000 rows
+[OK] intron_compleasm: 3,278,970 incoming rows; accepted=3,278,970, rejected during parsing=0
+[OK] intron_compleasm_summary: 85 incoming rows; accepted=85, rejected during parsing=0
+[INFO] flanks_compleasm: parsed 250,000 rows
+[INFO] flanks_compleasm: parsed 500,000 rows
+[INFO] flanks_compleasm: parsed 750,000 rows
+[INFO] flanks_compleasm: parsed 1,000,000 rows
+[OK] flanks_compleasm: 1,240,074 incoming rows; accepted=1,240,074, rejected during parsing=0
+[OK] flank_compleasm_summary: 255 incoming rows; accepted=255, rejected during parsing=0
+[OK] genomes: 85 incoming rows; accepted=85, rejected during parsing=0
+[OK] sequences: 114,705 incoming rows; accepted=114,705, rejected during parsing=0
+[OK] natural_history: 85 incoming rows; accepted=85, rejected during parsing=0
+[ERROR] nhphyml_runs: 4 incoming rows; accepted=0, rejected during parsing=4
+[INFO] Indexed sauropsida_odb12 for offline validation
+[INFO] Indexed orthologs for offline validation
+[INFO] Indexed ortholog_initial_qc for offline validation
+[INFO] Indexed ortholog_run_qc for offline validation
+[INFO] Indexed ortholog_summary for offline validation
+[INFO] Indexed intron_compleasm for offline validation
+[INFO] Indexed intron_compleasm_summary for offline validation
+[INFO] Indexed flanks_compleasm for offline validation
+[INFO] Indexed flank_sets_compleasm for offline validation
+[INFO] Indexed flank_compleasm_summary for offline validation
+[INFO] Indexed genomes for offline validation
+[INFO] Indexed sequences for offline validation
+[INFO] Indexed natural_history for offline validation
+[INFO] Indexed nhphyml_runs for offline validation
+[OK] sauropsida_odb12:odb12_id: duplicate rows=0
+[OK] orthologs:ortholog_pk: duplicate rows=0
+[OK] orthologs:sequence_pk,odb12_id: duplicate rows=0
+[OK] orthologs:genome_pk,odb12_id: duplicate rows=0
+[OK] ortholog_initial_qc:ortholog_pk: duplicate rows=0
+[OK] ortholog_run_qc:ortholog_run_qc_pk: duplicate rows=0
+[OK] ortholog_run_qc:ortholog_pk,nhphyml_run_pk: duplicate rows=0
+[OK] ortholog_summary:ortholog_summary_pk: duplicate rows=0
+[OK] ortholog_summary:genome_pk: duplicate rows=0
+[OK] intron_compleasm:intron_pk: duplicate rows=0
+[OK] intron_compleasm:ortholog_pk,intron_id: duplicate rows=0
+[OK] intron_compleasm_summary:intron_summary_pk: duplicate rows=0
+[OK] intron_compleasm_summary:genome_pk: duplicate rows=0
+[OK] flanks_compleasm:flank_pk: duplicate rows=0
+[OK] flanks_compleasm:ortholog_pk,flank_set_pk: duplicate rows=0
+[OK] flank_sets_compleasm:flank_set_pk: duplicate rows=0
+[OK] flank_sets_compleasm:upstream_bp,downstream_bp: duplicate rows=0
+[OK] flank_compleasm_summary:flank_summary_pk: duplicate rows=0
+[OK] flank_compleasm_summary:genome_pk,flank_set_pk: duplicate rows=0
+[OK] genomes:genome_pk: duplicate rows=0
+[OK] genomes:accession_id: duplicate rows=0
+[OK] sequences:sequence_pk: duplicate rows=0
+[OK] sequences:genome_pk,sequence_id: duplicate rows=0
+[OK] natural_history:species_pk: duplicate rows=0
+[OK] natural_history:species_normalized: duplicate rows=0
+[OK] nhphyml_runs:nhphyml_run_pk: duplicate rows=0
+[OK] nhphyml_runs:run_name: duplicate rows=0
+[OK] ortholog_initial_qc.ortholog_pk -> orthologs.ortholog_pk: rows=13,795, non-NULL=13,795, distinct=13,795, matched=13,795, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] ortholog_initial_qc.genome_pk -> genomes.genome_pk: rows=13,795, non-NULL=13,795, distinct=85, matched=13,795, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] ortholog_initial_qc.sequence_pk -> sequences.sequence_pk: rows=13,795, non-NULL=4,822, distinct=1,358, matched=4,822, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=8,973
+[OK] ortholog_initial_qc.odb12_id -> sauropsida_odb12.odb12_id: rows=13,795, non-NULL=13,795, distinct=4,122, matched=13,795, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] ortholog_run_qc.ortholog_pk -> orthologs.ortholog_pk: rows=311,370, non-NULL=311,370, distinct=131,580, matched=311,370, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[ERROR] ortholog_run_qc.nhphyml_run_pk -> nhphyml_runs.nhphyml_run_pk: rows=311,370, non-NULL=311,370, distinct=4, matched=0, unavailable=311,370, references to rejected parents=311,370, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] orthologs.sequence_pk -> sequences.sequence_pk: rows=498,949, non-NULL=440,206, distinct=3,283, matched=440,206, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=58,743
+[OK] orthologs.genome_pk -> genomes.genome_pk: rows=498,949, non-NULL=498,949, distinct=85, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] orthologs.odb12_id -> sauropsida_odb12.odb12_id: rows=498,949, non-NULL=498,949, distinct=6,092, matched=498,949, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] intron_compleasm.ortholog_pk -> orthologs.ortholog_pk: rows=3,278,970, non-NULL=3,278,970, distinct=384,606, matched=3,278,970, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] flanks_compleasm.ortholog_pk -> orthologs.ortholog_pk: rows=1,240,074, non-NULL=1,240,074, distinct=413,358, matched=1,240,074, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] flanks_compleasm.flank_set_pk -> flank_sets_compleasm.flank_set_pk: rows=1,240,074, non-NULL=1,240,074, distinct=3, matched=1,240,074, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] flank_compleasm_summary.flank_set_pk -> flank_sets_compleasm.flank_set_pk: rows=255, non-NULL=255, distinct=3, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] ortholog_summary.genome_pk -> genomes.genome_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] ortholog_summary.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] intron_compleasm_summary.genome_pk -> genomes.genome_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] intron_compleasm_summary.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] flank_compleasm_summary.genome_pk -> genomes.genome_pk: rows=255, non-NULL=255, distinct=85, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] flank_compleasm_summary.species_pk -> natural_history.species_pk: rows=255, non-NULL=255, distinct=85, matched=255, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] sequences.genome_pk -> genomes.genome_pk: rows=114,705, non-NULL=114,705, distinct=85, matched=114,705, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] genomes.species_pk -> natural_history.species_pk: rows=85, non-NULL=85, distinct=85, matched=85, unavailable=0, references to rejected parents=0, IDs absent from source=0, absence inconclusive=0 NULL skipped=0
+[OK] orthologs: genome_pk differs from the referenced sequence's genome_pk; comparable=440,206, mismatches=0, uncomparable=58,743
+[OK] intron_compleasm: parent_id differs from referenced ortholog odb12_id; comparable=3,278,970, mismatches=0, uncomparable=0
+[OK] ortholog_summary: species_pk differs from the referenced genome's species_pk; comparable=85, mismatches=0, uncomparable=0
+[OK] intron_compleasm_summary: species_pk differs from the referenced genome's species_pk; comparable=85, mismatches=0, uncomparable=0
+[OK] flank_compleasm_summary: species_pk differs from the referenced genome's species_pk; comparable=255, mismatches=0, uncomparable=0
+
+conda deactivate
+conda activate bio
+python 06_nhphyml_to_tsvs_v4.py \
+--sql-tsv-dir /Users/rossoaa/projects/genomes/records/sql_tsvs
+
+------------------------------------------------------------------
+##################################################################
+------------------------------------------------------------------
+##################################################################
+------------------------------------------------------------------
+##################################################################
+------------------------------------------------------------------
+##################################################################
+------------------------------------------------------------------
+##################################################################
+
 2026OCT6
 
 conda activate liftoff_2

@@ -1,0 +1,18 @@
+time	error_type	message	traceback
+2026-11-04T12:45:34	SystemExit	2	"Traceback (most recent call last):
+  File ""/Users/rossoaa/projects/strength_of_gene_conversion/genomes_database/sql/04_build_compleasm_feature_tsvs_v9.py"", line 2115, in <module>
+    main()
+  File ""/Users/rossoaa/projects/strength_of_gene_conversion/genomes_database/sql/04_build_compleasm_feature_tsvs_v9.py"", line 1598, in main
+    args = parser.parse_args()
+  File ""/Users/rossoaa/miniconda3/envs/liftoff_2/lib/python3.10/argparse.py"", line 1833, in parse_args
+    args, argv = self.parse_known_args(args, namespace)
+  File ""/Users/rossoaa/miniconda3/envs/liftoff_2/lib/python3.10/argparse.py"", line 1866, in parse_known_args
+    namespace, args = self._parse_known_args(args, namespace)
+  File ""/Users/rossoaa/miniconda3/envs/liftoff_2/lib/python3.10/argparse.py"", line 2107, in _parse_known_args
+    self.error(_('the following arguments are required: %s') %
+  File ""/Users/rossoaa/miniconda3/envs/liftoff_2/lib/python3.10/argparse.py"", line 2594, in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+  File ""/Users/rossoaa/miniconda3/envs/liftoff_2/lib/python3.10/argparse.py"", line 2581, in exit
+    _sys.exit(status)
+SystemExit: 2
+"
